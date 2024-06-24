@@ -9,6 +9,7 @@
     "preview": "bunx --bun vite preview"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.5",
     "prettier": "^3.3.2",
     "typescript": "^5.5.2",
     "vite": "^5.3.1"
