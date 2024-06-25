@@ -18,11 +18,18 @@ describe('ECS Core', () => {
 	test('Destroys entities', () => {
 		const ecs = new Core();
 		const entity = ecs.createEntity();
+		ecs.addComponent(
+			entity,
+			new PlayerEntityState({ teamId: 0, id: entity }),
+		);
+		expect(ecs.getAllEntities()).toEqual([0]);
+		expect(ecs.getEntitiesWithComponents(PlayerEntityState)).toEqual([0]);
 		ecs.destroyEntity(entity);
 		expect(ecs.getAllEntities()).toEqual([]);
+		expect(ecs.getEntitiesWithComponents(PlayerEntityState)).toEqual([]);
 	});
 
-	test('Adds components', () => {
+	test('Adds component', () => {
 		const ecs = new Core();
 		const entity = ecs.createEntity();
 		const Turn = new TurnCount();
@@ -38,7 +45,19 @@ describe('ECS Core', () => {
 		expect(ecs.getComponent(entity, TurnCount)).not.toBe(Player);
 	});
 
-	test('Removes components', () => {
+	test('Adds multiple components', () => {
+		const ecs = new Core();
+		const entity = ecs.createEntity();
+		const Turn = new TurnCount();
+		const Player = new PlayerEntityState({ teamId: 0, id: entity });
+
+		ecs.addComponents(entity, [Turn, Player]);
+
+		expect(ecs.getComponent(entity, TurnCount)).toBe(Turn);
+		expect(ecs.getComponent(entity, PlayerEntityState)).toBe(Player);
+	});
+
+	test('Removes component', () => {
 		const ecs = new Core();
 		const entity = ecs.createEntity();
 		const Turn = new TurnCount();
@@ -51,6 +70,21 @@ describe('ECS Core', () => {
 		ecs.removeComponent(entity, Turn);
 		expect(ecs.getComponent(entity, TurnCount)).toBeUndefined();
 		expect(ecs.getComponent(entity, PlayerEntityState)).toBe(Player);
+	});
+
+	test('Removes multiple components', () => {
+		const ecs = new Core();
+		const entity = ecs.createEntity();
+		const Turn = new TurnCount();
+		const Player = new PlayerEntityState({ teamId: 0, id: entity });
+
+		ecs.addComponent(entity, Turn);
+		expect(ecs.getComponent(entity, TurnCount)).toBe(Turn);
+		ecs.addComponent(entity, Player);
+
+		ecs.removeComponents(entity, [Turn, Player]);
+		expect(ecs.getComponent(entity, TurnCount)).toBeUndefined();
+		expect(ecs.getComponent(entity, PlayerEntityState)).toBeUndefined();
 	});
 
 	test('Get entities with components', () => {
@@ -144,5 +178,129 @@ describe('ECS Core', () => {
 		await ecs.update(0);
 
 		expect(fn).toHaveBeenCalledWith(0);
+	});
+
+	test('Systems execute in correct order', async () => {
+		const ecs = new Core();
+		const order: string[] = [];
+
+		class SystemA extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('A');
+			}
+		}
+
+		class SystemB extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('B');
+			}
+		}
+
+		class SystemC extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('C');
+			}
+		}
+
+		const systemA = new SystemA(ecs);
+		const systemB = new SystemB(ecs);
+		const systemC = new SystemC(ecs);
+
+		ecs.addSystem(systemA);
+		ecs.addSystem(systemB);
+		ecs.addSystem(systemC);
+
+		// Setting up dependencies: A -> B -> C
+		ecs.addDependency(systemA, systemB);
+		ecs.addDependency(systemB, systemC);
+
+		await ecs.update(0);
+
+		expect(order).toEqual(['C', 'B', 'A']);
+	});
+
+	test('Handles multiple independent systems', async () => {
+		const ecs = new Core();
+		const order: string[] = [];
+
+		class SystemA extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('A');
+			}
+		}
+
+		class SystemB extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('B');
+			}
+		}
+
+		class SystemC extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {
+				order.push('C');
+			}
+		}
+
+		const systemA = new SystemA(ecs);
+		const systemB = new SystemB(ecs);
+		const systemC = new SystemC(ecs);
+
+		ecs.addSystem(systemA);
+		ecs.addSystem(systemB);
+		ecs.addSystem(systemC);
+
+		await ecs.update(0);
+
+		expect(order).toEqual(expect.arrayContaining(['A', 'B', 'C']));
+	});
+
+	test('Cycles in dependencies throw error', () => {
+		const ecs = new Core();
+
+		class SystemA extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {}
+		}
+
+		class SystemB extends System {
+			constructor(ecs: Core) {
+				super(ecs);
+			}
+			update(_: number) {}
+		}
+
+		const systemA = new SystemA(ecs);
+		const systemB = new SystemB(ecs);
+
+		ecs.addSystem(systemA);
+		ecs.addSystem(systemB);
+
+		// Creating a cyclic dependency: A -> B -> A
+		ecs.addDependency(systemA, systemB);
+		ecs.addDependency(systemB, systemA);
+
+		expect(ecs.update(0)).rejects.toThrow(
+			'Cycle detected in dependency graph',
+		);
 	});
 });
