@@ -1,10 +1,11 @@
 import { expect, test, describe, jest } from 'bun:test';
-import { ECSCore, System } from './core';
+
+import { Core, System } from './core';
 import { PlayerEntityState, TurnCount } from './components';
 
 describe('ECS Core', () => {
 	test('Creates entities', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity = ecs.createEntity();
 		ecs.addComponent(
 			entity,
@@ -15,14 +16,14 @@ describe('ECS Core', () => {
 	});
 
 	test('Destroys entities', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity = ecs.createEntity();
 		ecs.destroyEntity(entity);
 		expect(ecs.getAllEntities()).toEqual([]);
 	});
 
 	test('Adds components', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity = ecs.createEntity();
 		const Turn = new TurnCount();
 
@@ -38,7 +39,7 @@ describe('ECS Core', () => {
 	});
 
 	test('Removes components', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity = ecs.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -53,7 +54,7 @@ describe('ECS Core', () => {
 	});
 
 	test('Get entities with components', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity1 = ecs.createEntity();
 		const entity2 = ecs.createEntity();
 		const Turn = new TurnCount();
@@ -74,7 +75,7 @@ describe('ECS Core', () => {
 	});
 
 	test('Has component', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity = ecs.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -90,7 +91,7 @@ describe('ECS Core', () => {
 	});
 
 	test('Get all entities', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const entity1 = ecs.createEntity();
 
 		expect(ecs.getAllEntities()).toEqual([entity1]);
@@ -100,7 +101,7 @@ describe('ECS Core', () => {
 	});
 
 	test('Pools entities', () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 
 		const entity1 = ecs.createEntity();
 		ecs.destroyEntity(entity1);
@@ -114,33 +115,33 @@ describe('ECS Core', () => {
 	});
 
 	test('Add system', () => {
-		const em = new ECSCore();
+		const ecs = new Core();
 		const S = class extends System {
-			constructor(ecs: ECSCore) {
+			constructor(ecs: Core) {
 				super(ecs);
 			}
 			update(_: number) {
 				return;
 			}
 		};
-		const system = new S(em);
-		em.addSystem(system);
+		const system = new S(ecs);
+		ecs.addSystem(system);
 
-		expect(em.getSystem(S)).toBe(system);
+		expect(ecs.getSystem(S)).toBe(system);
 	});
 
 	test('Update systems', async () => {
-		const ecs = new ECSCore();
+		const ecs = new Core();
 		const fn = jest.fn();
 		const S = class extends System {
-			constructor(ecs: ECSCore) {
+			constructor(ecs: Core) {
 				super(ecs);
 			}
 			update = fn;
 		};
 		const system = new S(ecs);
 		ecs.addSystem(system);
-		await ecs.updateSystems(0);
+		await ecs.update(0);
 
 		expect(fn).toHaveBeenCalledWith(0);
 	});

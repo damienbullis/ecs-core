@@ -1,5 +1,5 @@
 import { CanvasComponent, PlayerEntityState, SpaceState } from '../components';
-import type { Entity, ECSCore, Component } from '../core';
+import type { Entity, Core } from '../core';
 import { System } from '../core';
 
 const INIT_SIZE = 14;
@@ -11,7 +11,7 @@ const INIT_SIZE = 14;
  * - add locations to players & players to locations
  */
 export class InitSpaces extends System {
-	constructor(ecs: ECSCore, ...players: Entity[]) {
+	constructor(ecs: Core, ...players: Entity[]) {
 		super(ecs);
 
 		const playerEntities = players.map((p) =>
@@ -48,7 +48,7 @@ export class InitSpaces extends System {
 export class EventBus extends System {
 	private channels: { [key: string]: ((data?: any) => void)[] } = {};
 
-	constructor(ecs: ECSCore) {
+	constructor(ecs: Core) {
 		super(ecs);
 	}
 
@@ -93,7 +93,7 @@ export class Canvas extends System {
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 
-	constructor(ecs: ECSCore) {
+	constructor(ecs: Core) {
 		super(ecs);
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;

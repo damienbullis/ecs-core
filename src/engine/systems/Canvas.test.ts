@@ -1,6 +1,6 @@
 import { describe, test, expect, jest } from 'bun:test';
 import { Canvas } from './';
-import { ECSCore } from '../core';
+import { Core } from '../core';
 
 // polyfill document and window
 global.document = {
@@ -22,7 +22,7 @@ global.window = {
 };
 
 describe('Canvas', () => {
-	const ecs = new ECSCore();
+	const ecs = new Core();
 	ecs.addSystem(new Canvas(ecs));
 	test('Creates a canvas element', () => {
 		expect(document.createElement).toHaveBeenCalledWith('canvas');

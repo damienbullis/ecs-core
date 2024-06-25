@@ -1,9 +1,9 @@
 import { describe, expect, test, jest } from 'bun:test';
 import { EventBus } from '.';
-import { ECSCore } from '../core';
+import { Core } from '../core';
 
 describe('EventBus', () => {
-	const ecs = new ECSCore();
+	const ecs = new Core();
 	const eventBus = new EventBus(ecs);
 
 	test('Can add system to core', () => {

@@ -1,10 +1,10 @@
 import { expect, describe, test } from 'bun:test';
 import { InitSpaces } from '.';
-import { ECSCore } from '../core';
+import { Core } from '../core';
 import { PlayerEntityState, SpaceState } from '../components';
 
 describe('InitSpaces', () => {
-	const ecs = new ECSCore();
+	const ecs = new Core();
 	const player = ecs.createEntity();
 
 	ecs.addComponent(player, new PlayerEntityState({ teamId: 0, id: player }));
