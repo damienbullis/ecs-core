@@ -1,87 +1,18 @@
-/**
- * Type representing an entity as a unique identifier (number).
- */
-export type Entity = number;
+import type { Component, CoreInterface, Entity, System } from './types';
+import { DependencyGraph } from './utils';
 
-/**
- * Interface representing a component.
- * @interface
- */
-export interface Component {}
-
-/**
- * Interface representing a system with an update method.
- * @interface
- */
-
-/**
- * Base class for systems.
- * @class
- */
-export abstract class System {
-	/**
-	 * Constructor for the System class.
-	 * @param ecs - The ECS core to use.
-	 */
-	constructor(protected ecs: ECSCore) {
-		this.ecs = ecs;
-	}
-
-	/**
-	 * Update method to be called every frame with deltaTime.
-	 * @param deltaTime - The time elapsed since the last update call.
-	 */
-	abstract update(deltaTime: number): void | Promise<void>;
-}
-
-/**
- * Class representing the core of the ECS engine.
- * @class
- */
-export class ECSCore {
+/** Creates the Core ECS  */
+class Core implements CoreInterface {
+	//#region Core state
 	private nextEntityId = 0;
 	private entityPool: Entity[] = [];
 	private entities: Map<Function, Component[]>[] = [];
 	private componentEntityMap: Map<Function, Entity[]> = new Map();
-	private systems: Map<Function, System> = new Map();
+	private systems: System[] = [];
+	private dependencyGraph: DependencyGraph = new DependencyGraph();
+	//#endregion
 
-	/**
-	 * Adds a system to the ECS.
-	 * @param system - The system to add.
-	 */
-	addSystem(system: System) {
-		this.systems.set(system.constructor, system);
-	}
-
-	/**
-	 * Retrieves a system of a specified type.
-	 * @template T
-	 * @param type - The constructor of the system type.
-	 * @returns The instance of the requested system.
-	 */
-	getSystem<T extends System>(type: { new (...args: any[]): T }): T {
-		return this.systems.get(type) as T;
-	}
-
-	/**
-	 * Updates all systems.
-	 * @param deltaTime - The time elapsed since the last update call.
-	 */
-	async updateSystems(deltaTime: number) {
-		await Promise.all(
-			// Array.from(this.systems.values()).map((system) => system.update(deltaTime)),
-			[
-				this.systems.forEach(
-					(system) => system.update && system.update(deltaTime),
-				),
-			],
-		);
-	}
-
-	/**
-	 * Creates a new entity.
-	 * @returns The newly created entity.
-	 */
+	//#region Entity & Component Methods
 	createEntity() {
 		let entity: Entity;
 		if (this.entityPool.length > 0) {
@@ -93,10 +24,6 @@ export class ECSCore {
 		return entity;
 	}
 
-	/**
-	 * Destroys an entity.
-	 * @param entity - The entity to destroy.
-	 */
 	destroyEntity(entity: Entity) {
 		const entityComponents = this.entities[entity];
 		if (entityComponents) {
@@ -114,11 +41,6 @@ export class ECSCore {
 		this.entityPool.push(entity);
 	}
 
-	/**
-	 * Adds a component to an entity.
-	 * @param e - The entity to add the component to.
-	 * @param c - The component to add.
-	 */
 	addComponent(e: Entity, c: Component) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
@@ -139,11 +61,6 @@ export class ECSCore {
 		}
 	}
 
-	/**
-	 * Removes a component from an entity.
-	 * @param e - The entity to remove the component from.
-	 * @param c - The component to remove.
-	 */
 	removeComponent(e: Entity, c: Component) {
 		const entityComponents = this.entities[e];
 		if (!entityComponents) {
@@ -159,7 +76,6 @@ export class ECSCore {
 				}
 			}
 		}
-
 		const entitiesWithComponent = this.componentEntityMap.get(
 			c.constructor,
 		);
@@ -171,11 +87,6 @@ export class ECSCore {
 		}
 	}
 
-	/**
-	 * Adds multiple components to an entity.
-	 * @param e - The entity to add components to.
-	 * @param components - The components to add.
-	 */
 	addComponents(e: Entity, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
@@ -204,11 +115,6 @@ export class ECSCore {
 		}
 	}
 
-	/**
-	 * Removes multiple components from an entity.
-	 * @param e - The entity to remove components from.
-	 * @param components - The components to remove.
-	 */
 	removeComponents(e: Entity, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
@@ -240,13 +146,6 @@ export class ECSCore {
 		}
 	}
 
-	/**
-	 * Retrieves a component of a specified type from an entity.
-	 * @template T
-	 * @param entity - The entity to retrieve the component from.
-	 * @param type - The constructor of the component type.
-	 * @returns The instance of the requested component, or undefined if not found.
-	 */
 	getComponent<T extends Component>(
 		entity: Entity,
 		type: { new (...args: any[]): T },
@@ -260,11 +159,6 @@ export class ECSCore {
 		return componentsOfType ? (componentsOfType[0] as T) : undefined;
 	}
 
-	/**
-	 * Retrieves entities that have all specified component types.
-	 * @param types - The constructors of the component types.
-	 * @returns The list of entities that have all specified components.
-	 */
 	getEntitiesWithComponents(...types: Array<Function>): Entity[] {
 		if (types.length === 0) return [];
 
@@ -281,22 +175,42 @@ export class ECSCore {
 		);
 	}
 
-	/**
-	 * Checks if an entity has a component of a specified type.
-	 * @param entity - The entity to check.
-	 * @param type - The constructor of the component type.
-	 * @returns True if the entity has the component, false otherwise.
-	 */
 	hasComponent(entity: Entity, type: Function): boolean {
 		const entityComponents = this.entities[entity];
 		return entityComponents ? entityComponents.has(type) : false;
 	}
 
-	/**
-	 * Retrieves all entities in the ECS.
-	 * @returns The list of all entities.
-	 */
 	getAllEntities(): Entity[] {
 		return this.entities.map((_, entity) => entity);
 	}
+	//#endregion
+
+	//#region System Methods
+
+	addSystem(system: System): void {
+		this.systems.push(system);
+		this.dependencyGraph.addSystem(system);
+	}
+
+	getSystem<T extends System>(system: { new (...args: any[]): T }) {
+		return this.systems.find((s) => s instanceof system) as T | undefined;
+	}
+
+	addDependency(system: System, dependency: System): void {
+		this.dependencyGraph.addDependency(system, dependency);
+	}
+
+	async update(deltaTime: number): Promise<void> {
+		const sortedSystems = this.dependencyGraph.topologicalSort();
+
+		await Promise.all(
+			sortedSystems.map((system) => system.update(deltaTime)),
+		);
+	}
+
+	//#endregion
 }
+
+export type { Component, Entity } from './types';
+export { System } from './types';
+export { Core };
