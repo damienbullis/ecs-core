@@ -109,8 +109,7 @@ export class Canvas extends System {
 		this.canvas.height = window.innerHeight;
 	}
 
-	update(deltaTime: number) {
-		console.log('CanvasSystem update', deltaTime);
+	update(_: number) {
 		// Clear the canvas
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
