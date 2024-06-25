@@ -104,6 +104,8 @@ export class DependencyGraph {
 			throw new Error('Cycle detected in dependency graph');
 		}
 
+		// Execute systems in reverse order
+		sortedSystems.reverse();
 		this.cachedSort = sortedSystems;
 		this.isDirty = false;
 		return sortedSystems;

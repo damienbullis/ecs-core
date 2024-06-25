@@ -119,8 +119,8 @@ export interface CoreInterface {
 	/**
 	 * Add a dependency between two systems.
 	 * Updates the dependency graph with the new dependency.
-	 * @param system - The system that depends on the other.
-	 * @param dependency - The system that the other depends on.
+	 * @param system - The system to add the dependency to.
+	 * @param dependency - The dependency system.
 	 */
 	addDependency(system: System, dependency: System): void;
 

@@ -202,7 +202,6 @@ class Core implements CoreInterface {
 
 	async update(deltaTime: number): Promise<void> {
 		const sortedSystems = this.dependencyGraph.topologicalSort();
-
 		await Promise.all(
 			sortedSystems.map((system) => system.update(deltaTime)),
 		);
