@@ -24,6 +24,11 @@ global.window = {
 describe('Canvas', () => {
 	const ecs = new Core();
 	ecs.addSystem(new Canvas(ecs));
+
+	test('Add canvas system to core', () => {
+		expect(ecs.getSystem(Canvas)).toBeInstanceOf(Canvas);
+	});
+
 	test('Creates a canvas element', () => {
 		expect(document.createElement).toHaveBeenCalledWith('canvas');
 		expect(document.body.appendChild).toHaveBeenCalled();
@@ -31,5 +36,17 @@ describe('Canvas', () => {
 
 	test('Resizes the canvas on mount', () => {
 		expect(addEventListener).toHaveBeenCalled();
+	});
+
+	test('Updates the canvas system', () => {
+		const canvas = ecs.getSystem(Canvas) as Canvas;
+		const update = jest.fn();
+
+		//@ts-expect-error - jest.fn() is a mock function
+		canvas.context.clearRect = update;
+
+		ecs.update(0);
+
+		expect(update).toHaveBeenCalled();
 	});
 });
