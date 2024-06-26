@@ -31,7 +31,7 @@ describe('ECS Core', () => {
 		};
 		const system = new S(ecs);
 		ecs.addSystem(system);
-		await ecs.update(0);
+		ecs.update(0);
 
 		expect(fn).toHaveBeenCalledWith(0);
 	});
@@ -79,7 +79,7 @@ describe('ECS Core', () => {
 		ecs.addDependency(systemA, systemB);
 		ecs.addDependency(systemB, systemC);
 
-		await ecs.update(0);
+		ecs.update(0);
 
 		expect(order).toEqual(['C', 'B', 'A']);
 	});
@@ -123,7 +123,7 @@ describe('ECS Core', () => {
 		ecs.addSystem(systemB);
 		ecs.addSystem(systemC);
 
-		await ecs.update(0);
+		ecs.update(0);
 
 		expect(order).toEqual(expect.arrayContaining(['A', 'B', 'C']));
 	});
@@ -155,7 +155,7 @@ describe('ECS Core', () => {
 		ecs.addDependency(systemA, systemB);
 		ecs.addDependency(systemB, systemA);
 
-		expect(ecs.update(0)).rejects.toThrow(
+		expect(() => ecs.update(0)).toThrow(
 			'Cycle detected in dependency graph',
 		);
 	});

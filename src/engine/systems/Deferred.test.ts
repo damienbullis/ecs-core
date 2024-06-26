@@ -1,6 +1,7 @@
 import { describe, expect, test, spyOn } from 'bun:test';
 import { Deferred, EntityManager } from '.';
-import { Component, Core } from '../core';
+import { Core } from '../core';
+import { Component } from '../types';
 
 describe('Deferred', () => {
 	const core = new Core();

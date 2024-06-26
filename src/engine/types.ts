@@ -129,5 +129,5 @@ export interface CoreInterface {
 	 * Updates systems in the order determined by the dependency graph.
 	 * @param deltaTime - The time elapsed since the last update call.
 	 */
-	update(deltaTime: number): Promise<void>;
+	update(deltaTime: number): void;
 }

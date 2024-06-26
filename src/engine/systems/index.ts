@@ -1,7 +1,6 @@
 import { CanvasComponent, PlayerEntityState, SpaceState } from '../components';
-import type { Entity, Core, Component } from '../core';
-import { System } from '../core';
-import { CoreInterface } from '../types';
+import { Component, CoreInterface, Entity } from '../types';
+import { Core, System } from '../core';
 
 const INIT_SIZE = 14;
 
@@ -222,7 +221,6 @@ export class EntityManager extends System {
 	}
 	update() {}
 
-	//#region Entity & Component Methods
 	createEntity() {
 		let entity: Entity;
 		if (this.entityPool.length > 0) {
@@ -393,6 +391,4 @@ export class EntityManager extends System {
 	getAllEntities(): Entity[] {
 		return this.entities.map((_, entity) => entity);
 	}
-
-	//#endregion
 }

@@ -1,8 +1,11 @@
+// TODO: refactor to remove types.ts and use core.ts
 import type { CoreInterface, System } from './types';
 import { DependencyGraph } from './utils';
 
 /**
- * Creates the Core ECS
+ * Core Engine
+ *
+ * This is a variant of an ECS Engine, not sure what to call this, maybe just Systems Pattern
  */
 class Core implements CoreInterface {
 	private systems: System[] = [];
@@ -22,14 +25,12 @@ class Core implements CoreInterface {
 		this.dependencyGraph.addDependency(system, dependency);
 	}
 
-	async update(deltaTime: number): Promise<void> {
-		const sortedSystems = this.dependencyGraph.topologicalSort();
-		await Promise.all(
-			sortedSystems.map((system) => system.update(deltaTime)),
-		);
+	update(deltaTime: number): void {
+		this.dependencyGraph
+			.topologicalSort()
+			.map((system) => system.update(deltaTime));
 	}
 }
 
-export type { Component, Entity } from './types';
 export { System } from './types';
 export { Core };
