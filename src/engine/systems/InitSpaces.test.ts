@@ -1,24 +1,25 @@
 import { expect, describe, test } from 'bun:test';
-import { InitSpaces } from '.';
+import { EntityManager, InitSpaces } from '.';
 import { Core } from '../core';
 import { PlayerEntityState, SpaceState } from '../components';
 
 describe('InitSpaces', () => {
-	const ecs = new Core();
-	const player = ecs.createEntity();
+	const core = new Core();
+	const em = new EntityManager(core);
+	const player = em.createEntity();
 
-	ecs.addComponent(player, new PlayerEntityState({ teamId: 0, id: player }));
-	const ai = ecs.createEntity();
-	ecs.addComponent(ai, new PlayerEntityState({ teamId: 1, id: ai }));
+	em.addComponent(player, new PlayerEntityState({ teamId: 0, id: player }));
+	const ai = em.createEntity();
+	em.addComponent(ai, new PlayerEntityState({ teamId: 1, id: ai }));
 
-	const initSpaces = new InitSpaces(ecs, player, ai);
-	ecs.addSystem(initSpaces);
+	const initSpaces = new InitSpaces(core, em, player, ai);
+	core.addSystem(initSpaces);
 
-	const playerState = ecs.getComponent(player, PlayerEntityState);
-	const aiState = ecs.getComponent(ai, PlayerEntityState);
+	const playerState = em.getComponent(player, PlayerEntityState);
+	const aiState = em.getComponent(ai, PlayerEntityState);
 
 	test('Can add system to core', () => {
-		const systems = ecs.getSystem(InitSpaces);
+		const systems = core.getSystem(InitSpaces);
 		expect(systems).toBe(initSpaces);
 	});
 
@@ -28,9 +29,9 @@ describe('InitSpaces', () => {
 	});
 
 	test('Spaces with entities have correct locations', () => {
-		const spaces = ecs
+		const spaces = em
 			.getEntitiesWithComponents(SpaceState)
-			.map((s) => ecs.getComponent(s, SpaceState));
+			.map((s) => em.getComponent(s, SpaceState));
 		const playerLocation = spaces.find((s) =>
 			s?.entities.includes(player),
 		)?.location;

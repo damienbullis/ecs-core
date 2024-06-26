@@ -1,5 +1,5 @@
 import { describe, test, expect, jest } from 'bun:test';
-import { Canvas } from './';
+import { Canvas, EntityManager } from './';
 import { Core } from '../core';
 
 // polyfill document and window
@@ -23,7 +23,8 @@ global.window = {
 
 describe('Canvas', () => {
 	const ecs = new Core();
-	ecs.addSystem(new Canvas(ecs));
+	const em = new EntityManager(ecs);
+	ecs.addSystem(new Canvas(ecs, em));
 
 	test('Add canvas system to core', () => {
 		expect(ecs.getSystem(Canvas)).toBeInstanceOf(Canvas);
