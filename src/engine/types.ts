@@ -14,8 +14,8 @@ export interface Component {}
  * @class
  */
 export abstract class System {
-	constructor(protected ecs: CoreInterface) {
-		this.ecs = ecs;
+	constructor(protected core: CoreInterface) {
+		this.core = core;
 	}
 
 	/**

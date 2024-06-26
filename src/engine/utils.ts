@@ -111,7 +111,7 @@ export class DependencyGraph {
 		return sortedSystems;
 	}
 
-	markDirty(): void {
-		this.isDirty = true;
+	getDirty(): boolean {
+		return this.isDirty;
 	}
 }

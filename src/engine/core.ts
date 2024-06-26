@@ -1,7 +1,9 @@
 import type { Component, CoreInterface, Entity, System } from './types';
 import { DependencyGraph } from './utils';
 
-/** Creates the Core ECS  */
+/**
+ * Creates the Core ECS
+ */
 class Core implements CoreInterface {
 	//#region Core state
 	private nextEntityId = 0;
