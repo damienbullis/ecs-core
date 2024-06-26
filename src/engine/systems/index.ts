@@ -12,17 +12,17 @@ const INIT_SIZE = 14;
  * - add locations to players & players to locations
  */
 export class InitSpaces extends System {
-	constructor(ecs: Core, ...players: Entity[]) {
+	constructor(ecs: Core, em: EntityManager, ...players: Entity[]) {
 		super(ecs);
 
 		const playerEntities = players.map((p) =>
-			ecs.getComponent(p, PlayerEntityState),
+			em.getComponent(p, PlayerEntityState),
 		);
 
 		let playerCount = 1;
 		const distance = Math.floor((INIT_SIZE - players.length) / 3);
 		for (let i = 0; i < INIT_SIZE; i++) {
-			const s = ecs.createEntity();
+			const s = em.createEntity();
 			const space = new SpaceState();
 			if (
 				playerCount * distance + players.length / 2 === i &&
@@ -39,7 +39,7 @@ export class InitSpaces extends System {
 			// set the initial state of the spaces
 			space.id = s;
 			space.location = i;
-			ecs.addComponent(s, space);
+			em.addComponent(s, space);
 		}
 	}
 
@@ -94,12 +94,13 @@ export class Canvas extends System {
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 
-	constructor(core: Core) {
+	constructor(core: Core, entityManager: EntityManager) {
 		super(core);
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-		core.addComponent(
-			core.createEntity(),
+
+		entityManager.addComponent(
+			entityManager.createEntity(),
 			new CanvasComponent(this.canvas),
 		);
 
@@ -122,9 +123,11 @@ export class Canvas extends System {
 export class Deferred extends System {
 	private deferred: (() => void)[] = [];
 	private currentIndex = 0;
+	private entityManager: EntityManager;
 
-	constructor(core: CoreInterface) {
+	constructor(core: CoreInterface, entityManager: EntityManager) {
 		super(core);
+		this.entityManager = entityManager;
 	}
 
 	/**
@@ -156,7 +159,7 @@ export class Deferred extends System {
 	deferCreate(): void {
 		this.defer(() => {
 			try {
-				this.core.createEntity();
+				this.entityManager.createEntity();
 			} catch (error) {
 				console.error('Error creating entity:', error);
 			}
@@ -170,7 +173,7 @@ export class Deferred extends System {
 	deferDestroy(entity: Entity): void {
 		this.defer(() => {
 			try {
-				this.core.destroyEntity(entity);
+				this.entityManager.destroyEntity(entity);
 			} catch (error) {
 				console.error('Error destroying entity:', error);
 			}
@@ -185,7 +188,7 @@ export class Deferred extends System {
 	deferAdd(entity: Entity, component: Component): void {
 		this.defer(() => {
 			try {
-				this.core.addComponent(entity, component);
+				this.entityManager.addComponent(entity, component);
 			} catch (error) {
 				console.error('Error adding component:', error);
 			}
@@ -200,10 +203,196 @@ export class Deferred extends System {
 	deferRemove(entity: Entity, component: Component): void {
 		this.defer(() => {
 			try {
-				this.core.removeComponent(entity, component);
+				this.entityManager.removeComponent(entity, component);
 			} catch (error) {
 				console.error('Error removing component:', error);
 			}
 		});
 	}
+}
+
+export class EntityManager extends System {
+	private nextEntityId = 0;
+	private entityPool: Entity[] = [];
+	private entities: Map<Function, Component[]>[] = [];
+	private componentEntityMap: Map<Function, Entity[]> = new Map();
+
+	constructor(core: CoreInterface) {
+		super(core);
+	}
+	update() {}
+
+	//#region Entity & Component Methods
+	createEntity() {
+		let entity: Entity;
+		if (this.entityPool.length > 0) {
+			entity = this.entityPool.pop()!;
+		} else {
+			entity = this.nextEntityId++;
+		}
+		this.entities[entity] = new Map<Function, Component[]>();
+		return entity;
+	}
+
+	destroyEntity(entity: Entity) {
+		const entityComponents = this.entities[entity];
+		if (entityComponents) {
+			entityComponents.forEach((_, type) => {
+				const entitiesWithComponent = this.componentEntityMap.get(type);
+				if (entitiesWithComponent) {
+					const index = entitiesWithComponent.indexOf(entity);
+					if (index !== -1) {
+						entitiesWithComponent.splice(index, 1);
+					}
+				}
+			});
+			delete this.entities[entity];
+		}
+		this.entityPool.push(entity);
+	}
+
+	addComponent(e: Entity, c: Component) {
+		let entityComponents = this.entities[e];
+		if (!entityComponents) {
+			entityComponents = new Map<Function, Component[]>();
+			this.entities[e] = entityComponents;
+		}
+		const componentsOfType = entityComponents.get(c.constructor) || [];
+		componentsOfType.push(c);
+		entityComponents.set(c.constructor, componentsOfType);
+
+		let entitiesWithComponent = this.componentEntityMap.get(c.constructor);
+		if (!entitiesWithComponent) {
+			entitiesWithComponent = [];
+			this.componentEntityMap.set(c.constructor, entitiesWithComponent);
+		}
+		if (!entitiesWithComponent.includes(e)) {
+			entitiesWithComponent.push(e);
+		}
+	}
+
+	removeComponent(e: Entity, c: Component) {
+		const entityComponents = this.entities[e];
+		if (!entityComponents) {
+			throw new Error(`Entity ${e} does not exist`);
+		}
+		const componentsOfType = entityComponents.get(c.constructor);
+		if (componentsOfType) {
+			const index = componentsOfType.indexOf(c);
+			if (index !== -1) {
+				componentsOfType.splice(index, 1);
+				if (componentsOfType.length === 0) {
+					entityComponents.delete(c.constructor);
+				}
+			}
+		}
+		const entitiesWithComponent = this.componentEntityMap.get(
+			c.constructor,
+		);
+		if (entitiesWithComponent) {
+			const index = entitiesWithComponent.indexOf(e);
+			if (index !== -1) {
+				entitiesWithComponent.splice(index, 1);
+			}
+		}
+	}
+
+	addComponents(e: Entity, components: Component[]) {
+		let entityComponents = this.entities[e];
+		if (!entityComponents) {
+			entityComponents = new Map<Function, Component[]>();
+			this.entities[e] = entityComponents;
+		}
+		for (const component of components) {
+			const componentsOfType =
+				entityComponents.get(component.constructor) || [];
+			componentsOfType.push(component);
+			entityComponents.set(component.constructor, componentsOfType);
+
+			let entitiesWithComponent = this.componentEntityMap.get(
+				component.constructor,
+			);
+			if (!entitiesWithComponent) {
+				entitiesWithComponent = [];
+				this.componentEntityMap.set(
+					component.constructor,
+					entitiesWithComponent,
+				);
+			}
+			if (!entitiesWithComponent.includes(e)) {
+				entitiesWithComponent.push(e);
+			}
+		}
+	}
+
+	removeComponents(e: Entity, components: Component[]) {
+		let entityComponents = this.entities[e];
+		if (!entityComponents) {
+			throw new Error(`Entity ${e} does not exist`);
+		}
+		for (const component of components) {
+			const componentsOfType = entityComponents.get(
+				component.constructor,
+			);
+			if (componentsOfType) {
+				const index = componentsOfType.indexOf(component);
+				if (index !== -1) {
+					componentsOfType.splice(index, 1);
+					if (componentsOfType.length === 0) {
+						entityComponents.delete(component.constructor);
+					}
+				}
+			}
+
+			const entitiesWithComponent = this.componentEntityMap.get(
+				component.constructor,
+			);
+			if (entitiesWithComponent) {
+				const index = entitiesWithComponent.indexOf(e);
+				if (index !== -1) {
+					entitiesWithComponent.splice(index, 1);
+				}
+			}
+		}
+	}
+
+	getComponent<T extends Component>(
+		entity: Entity,
+		type: { new (...args: any[]): T },
+	): T | undefined {
+		const entityComponents = this.entities[entity];
+		if (!entityComponents) {
+			console.warn(`Entity ${entity} does not exist`);
+			return undefined;
+		}
+		const componentsOfType = entityComponents.get(type);
+		return componentsOfType ? (componentsOfType[0] as T) : undefined;
+	}
+
+	getEntitiesWithComponents(...types: Array<Function>): Entity[] {
+		if (types.length === 0) return [];
+
+		const sets = types.map(
+			(type) => this.componentEntityMap.get(type) || [],
+		);
+
+		const [smallestSet, ...restSets] = sets.sort(
+			(a, b) => a.length - b.length,
+		);
+
+		return smallestSet.filter((entity) =>
+			restSets.every((set) => set.includes(entity)),
+		);
+	}
+
+	hasComponent(entity: Entity, type: Function): boolean {
+		const entityComponents = this.entities[entity];
+		return entityComponents ? entityComponents.has(type) : false;
+	}
+
+	getAllEntities(): Entity[] {
+		return this.entities.map((_, entity) => entity);
+	}
+
+	//#endregion
 }
