@@ -1,6 +1,7 @@
 import { CanvasComponent, PlayerEntityState, SpaceState } from '../components';
-import type { Entity, Core } from '../core';
+import type { Entity, Core, Component } from '../core';
 import { System } from '../core';
+import { CoreInterface } from '../types';
 
 const INIT_SIZE = 14;
 
@@ -48,8 +49,8 @@ export class InitSpaces extends System {
 export class EventBus extends System {
 	private channels: { [key: string]: ((data?: any) => void)[] } = {};
 
-	constructor(ecs: Core) {
-		super(ecs);
+	constructor(core: Core) {
+		super(core);
 	}
 
 	/**
@@ -93,11 +94,14 @@ export class Canvas extends System {
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 
-	constructor(ecs: Core) {
-		super(ecs);
+	constructor(core: Core) {
+		super(core);
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-		ecs.addComponent(ecs.createEntity(), new CanvasComponent(this.canvas));
+		core.addComponent(
+			core.createEntity(),
+			new CanvasComponent(this.canvas),
+		);
 
 		document.body.appendChild(this.canvas);
 		window.addEventListener('resize', this.resize.bind(this));
@@ -112,5 +116,94 @@ export class Canvas extends System {
 	update(_: number) {
 		// Clear the canvas
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+}
+
+export class Deferred extends System {
+	private deferred: (() => void)[] = [];
+	private currentIndex = 0;
+
+	constructor(core: CoreInterface) {
+		super(core);
+	}
+
+	/**
+	 * All purpose defer function.
+	 * @param callback - The callback to defer.
+	 */
+	defer(callback: () => void) {
+		this.deferred.push(callback);
+	}
+
+	update() {
+		while (this.currentIndex < this.deferred.length) {
+			try {
+				this.deferred[this.currentIndex++]();
+			} catch (error) {
+				console.error('Error processing deferred operation:', error);
+			}
+		}
+		// Reset the array and index
+		this.deferred.length = 0;
+		this.currentIndex = 0;
+	}
+
+	// Standard core methods that are deferred
+
+	/**
+	 * Defer the creation of an entity.
+	 */
+	deferCreate(): void {
+		this.defer(() => {
+			try {
+				this.core.createEntity();
+			} catch (error) {
+				console.error('Error creating entity:', error);
+			}
+		});
+	}
+
+	/**
+	 * Defer the destruction of an entity.
+	 * @param entity The entity to destroy.
+	 */
+	deferDestroy(entity: Entity): void {
+		this.defer(() => {
+			try {
+				this.core.destroyEntity(entity);
+			} catch (error) {
+				console.error('Error destroying entity:', error);
+			}
+		});
+	}
+
+	/**
+	 * Defer adding a component to an entity.
+	 * @param entity The entity to add the component to.
+	 * @param component The component to add.
+	 */
+	deferAdd(entity: Entity, component: Component): void {
+		this.defer(() => {
+			try {
+				this.core.addComponent(entity, component);
+			} catch (error) {
+				console.error('Error adding component:', error);
+			}
+		});
+	}
+
+	/**
+	 * Defer removing a component from an entity.
+	 * @param entity The entity to remove the component from.
+	 * @param component The component to remove.
+	 */
+	deferRemove(entity: Entity, component: Component): void {
+		this.defer(() => {
+			try {
+				this.core.removeComponent(entity, component);
+			} catch (error) {
+				console.error('Error removing component:', error);
+			}
+		});
 	}
 }
