@@ -1,6 +1,6 @@
+import { test, describe, expect } from 'bun:test';
 import { DependencyGraph } from './utils';
 import { System } from './core';
-import { test, describe, expect } from 'bun:test';
 
 describe('DependencyGraph', () => {
 	class TestSystem extends System {
@@ -113,9 +113,9 @@ describe('DependencyGraph', () => {
 		const systemA = new TestSystem();
 
 		graph.addSystem(systemA);
-		graph.topologicalSort();
+		expect(graph.getDirty()).toBe(true);
 
-		graph.markDirty();
-		expect(graph.topologicalSort()).toEqual([systemA]);
+		graph.topologicalSort();
+		expect(graph.getDirty()).toBe(false);
 	});
 });
