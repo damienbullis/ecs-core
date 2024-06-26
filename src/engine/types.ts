@@ -30,41 +30,41 @@ export interface CoreInterface {
 	 * Creates a new entity.
 	 * @returns The newly created entity.
 	 */
-	createEntity(): Entity;
+	// createEntity(): Entity;
 
 	/**
 	 * Destroys an entity.
 	 * @param entity - The entity to destroy.
 	 */
-	destroyEntity(entity: Entity): void;
+	// destroyEntity(entity: Entity): void;
 
 	/**
 	 * Adds a component to an entity.
 	 * @param e - The entity to add the component to.
 	 * @param c - The component to add.
 	 */
-	addComponent(e: Entity, c: Component): void;
+	// addComponent(e: Entity, c: Component): void;
 
 	/**
 	 * Removes a component from an entity.
 	 * @param e - The entity to remove the component from.
 	 * @param c - The component to remove.
 	 */
-	removeComponent(e: Entity, c: Component): void;
+	// removeComponent(e: Entity, c: Component): void;
 
 	/**
 	 * Adds multiple components to an entity.
 	 * @param e - The entity to add components to.
 	 * @param components - The components to add.
 	 */
-	addComponents(e: Entity, components: Component[]): void;
+	// addComponents(e: Entity, components: Component[]): void;
 
 	/**
 	 * Removes multiple components from an entity.
 	 * @param e - The entity to remove components from.
 	 * @param components - The components to remove.
 	 */
-	removeComponents(e: Entity, components: Component[]): void;
+	// removeComponents(e: Entity, components: Component[]): void;
 
 	/**
 	 * Retrieves a component of a specified type from an entity.
@@ -73,17 +73,17 @@ export interface CoreInterface {
 	 * @param type - The constructor of the component type.
 	 * @returns The instance of the requested component, or undefined if not found.
 	 */
-	getComponent<T extends Component>(
-		entity: Entity,
-		type: { new (...args: any[]): T },
-	): T | undefined;
+	// getComponent<T extends Component>(
+	// entity: Entity,
+	// type: { new (...args: any[]): T },
+	// ): T | undefined;
 
 	/**
 	 * Retrieves entities that have all specified component types.
 	 * @param types - The constructors of the component types.
 	 * @returns The list of entities that have all specified components.
 	 */
-	getEntitiesWithComponents(...types: Array<Function>): Entity[];
+	// getEntitiesWithComponents(...types: Array<Function>): Entity[];
 
 	/**
 	 * Checks if an entity has a component of a specified type.
@@ -91,13 +91,13 @@ export interface CoreInterface {
 	 * @param type - The constructor of the component type.
 	 * @returns True if the entity has the component, false otherwise.
 	 */
-	hasComponent(entity: Entity, type: Function): boolean;
+	// hasComponent(entity: Entity, type: Function): boolean;
 
 	/**
 	 * Retrieves all entities in the ECS.
 	 * @returns The list of all entities.
 	 */
-	getAllEntities(): Entity[];
+	// getAllEntities(): Entity[];
 
 	/**
 	 * Add a system to the ECS.
