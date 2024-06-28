@@ -1,4 +1,4 @@
-import { Component } from '../types';
+import type { Component } from '../systems';
 
 export class TurnCount implements Component {
 	turnCount = 0;

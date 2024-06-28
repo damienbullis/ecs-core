@@ -1,36 +1,40 @@
-// TODO: refactor to remove types.ts and use core.ts
-import type { CoreInterface, System } from './types';
-import { DependencyGraph } from './utils';
+/**
+ * Base class for systems.
+ * @class
+ */
+export abstract class System {
+	constructor(protected core: Core) {
+		this.core = core;
+	}
+
+	/**
+	 * Update the system.
+	 * @param deltaTime - The time elapsed since the last update call.
+	 */
+	abstract update(deltaTime: number): void | Promise<void>;
+}
 
 /**
  * Core Engine
  *
  * This is a variant of an ECS Engine, not sure what to call this, maybe just Systems Pattern
  */
-class Core implements CoreInterface {
+export class Core {
 	private systems: System[] = [];
-	private dependencyGraph: DependencyGraph = new DependencyGraph();
 
-	addSystem<T extends System>(system: T): T {
+	/**
+	 * Add a system to the Core.
+	 */
+	add<T extends System>(system: T): T {
 		this.systems.push(system);
-		this.dependencyGraph.addSystem(system);
 		return system;
 	}
 
-	getSystem<T extends System>(system: { new (...args: any[]): T }) {
-		return this.systems.find((s) => s instanceof system) as T | undefined;
-	}
-
-	addDependency(system: System, dependency: System): void {
-		this.dependencyGraph.addDependency(system, dependency);
-	}
-
-	update(deltaTime: number): void {
-		this.dependencyGraph
-			.topologicalSort()
-			.map((system) => system.update(deltaTime));
+	/**
+	 * Retrieves all systems of a specified type from the Core.
+	 * @param system - The constructor of the system type.
+	 */
+	get<T extends System>(system: { new (...args: any[]): T }) {
+		return this.systems.filter((s) => s instanceof system) as T[];
 	}
 }
-
-export { System } from './types';
-export { Core };

@@ -1,6 +1,12 @@
 import { CanvasComponent, PlayerEntityState, SpaceState } from '../components';
-import { Component, CoreInterface, Entity } from '../types';
 import { Core, System } from '../core';
+import { DependencyGraph } from '../utils';
+
+/**
+ * Base interface for components.
+ * @interface
+ */
+export interface Component {}
 
 const INIT_SIZE = 14;
 
@@ -11,7 +17,7 @@ const INIT_SIZE = 14;
  * - add locations to players & players to locations
  */
 export class InitSpaces extends System {
-	constructor(ecs: Core, em: EntityManager, ...players: Entity[]) {
+	constructor(ecs: Core, em: EntityManager, ...players: number[]) {
 		super(ecs);
 
 		const playerEntities = players.map((p) =>
@@ -124,7 +130,7 @@ export class Deferred extends System {
 	private currentIndex = 0;
 	private entityManager: EntityManager;
 
-	constructor(core: CoreInterface, entityManager: EntityManager) {
+	constructor(core: Core, entityManager: EntityManager) {
 		super(core);
 		this.entityManager = entityManager;
 	}
@@ -169,7 +175,7 @@ export class Deferred extends System {
 	 * Defer the destruction of an entity.
 	 * @param entity The entity to destroy.
 	 */
-	deferDestroy(entity: Entity): void {
+	deferDestroy(entity: number): void {
 		this.defer(() => {
 			try {
 				this.entityManager.destroyEntity(entity);
@@ -184,7 +190,7 @@ export class Deferred extends System {
 	 * @param entity The entity to add the component to.
 	 * @param component The component to add.
 	 */
-	deferAdd(entity: Entity, component: Component): void {
+	deferAdd(entity: number, component: Component): void {
 		this.defer(() => {
 			try {
 				this.entityManager.addComponent(entity, component);
@@ -199,7 +205,7 @@ export class Deferred extends System {
 	 * @param entity The entity to remove the component from.
 	 * @param component The component to remove.
 	 */
-	deferRemove(entity: Entity, component: Component): void {
+	deferRemove(entity: number, component: Component): void {
 		this.defer(() => {
 			try {
 				this.entityManager.removeComponent(entity, component);
@@ -212,17 +218,22 @@ export class Deferred extends System {
 
 export class EntityManager extends System {
 	private nextEntityId = 0;
-	private entityPool: Entity[] = [];
+	private entityPool: number[] = [];
 	private entities: Map<Function, Component[]>[] = [];
-	private componentEntityMap: Map<Function, Entity[]> = new Map();
+	private componentEntityMap: Map<Function, number[]> = new Map();
 
-	constructor(core: CoreInterface) {
+	constructor(core: Core) {
 		super(core);
 	}
+	// Do nothing
 	update() {}
 
+	/**
+	 * Creates a new entity.
+	 * @returns The newly created entity.
+	 */
 	createEntity() {
-		let entity: Entity;
+		let entity: number;
 		if (this.entityPool.length > 0) {
 			entity = this.entityPool.pop()!;
 		} else {
@@ -232,7 +243,11 @@ export class EntityManager extends System {
 		return entity;
 	}
 
-	destroyEntity(entity: Entity) {
+	/**
+	 * Destroys an entity.
+	 * @param entity - The entity to destroy.
+	 */
+	destroyEntity(entity: number) {
 		const entityComponents = this.entities[entity];
 		if (entityComponents) {
 			entityComponents.forEach((_, type) => {
@@ -249,7 +264,12 @@ export class EntityManager extends System {
 		this.entityPool.push(entity);
 	}
 
-	addComponent(e: Entity, c: Component) {
+	/**
+	 * Adds a component to an entity.
+	 * @param e - The entity to add the component to.
+	 * @param c - The component to add.
+	 */
+	addComponent(e: number, c: Component) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			entityComponents = new Map<Function, Component[]>();
@@ -269,7 +289,12 @@ export class EntityManager extends System {
 		}
 	}
 
-	removeComponent(e: Entity, c: Component) {
+	/**
+	 * Removes a component from an entity.
+	 * @param e - The entity to remove the component from.
+	 * @param c - The component to remove.
+	 */
+	removeComponent(e: number, c: Component) {
 		const entityComponents = this.entities[e];
 		if (!entityComponents) {
 			throw new Error(`Entity ${e} does not exist`);
@@ -295,7 +320,12 @@ export class EntityManager extends System {
 		}
 	}
 
-	addComponents(e: Entity, components: Component[]) {
+	/**
+	 * Adds multiple components to an entity.
+	 * @param e - The entity to add components to.
+	 * @param components - The components to add.
+	 */
+	addComponents(e: number, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			entityComponents = new Map<Function, Component[]>();
@@ -323,7 +353,12 @@ export class EntityManager extends System {
 		}
 	}
 
-	removeComponents(e: Entity, components: Component[]) {
+	/**
+	 * Removes multiple components from an entity.
+	 * @param e - The entity to remove components from.
+	 * @param components - The components to remove.
+	 */
+	removeComponents(e: number, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			throw new Error(`Entity ${e} does not exist`);
@@ -354,8 +389,15 @@ export class EntityManager extends System {
 		}
 	}
 
+	/**
+	 * Retrieves a component of a specified type from an entity.
+	 * @template T
+	 * @param entity - The entity to retrieve the component from.
+	 * @param type - The constructor of the component type.
+	 * @returns The instance of the requested component, or undefined if not found.
+	 */
 	getComponent<T extends Component>(
-		entity: Entity,
+		entity: number,
 		type: { new (...args: any[]): T },
 	): T | undefined {
 		const entityComponents = this.entities[entity];
@@ -367,7 +409,12 @@ export class EntityManager extends System {
 		return componentsOfType ? (componentsOfType[0] as T) : undefined;
 	}
 
-	getEntitiesWithComponents(...types: Array<Function>): Entity[] {
+	/**
+	 * Retrieves entities that have all specified component types.
+	 * @param types - The constructors of the component types.
+	 * @returns The list of entities that have all specified components.
+	 */
+	getEntitiesWithComponents(...types: Array<Function>): number[] {
 		if (types.length === 0) return [];
 
 		const sets = types.map(
@@ -383,12 +430,61 @@ export class EntityManager extends System {
 		);
 	}
 
-	hasComponent(entity: Entity, type: Function): boolean {
+	/**
+	 * Checks if an entity has a component of a specified type.
+	 * @param entity - The entity to check.
+	 * @param type - The constructor of the component type.
+	 * @returns True if the entity has the component, false otherwise.
+	 */
+	hasComponent(entity: number, type: Function): boolean {
 		const entityComponents = this.entities[entity];
 		return entityComponents ? entityComponents.has(type) : false;
 	}
 
-	getAllEntities(): Entity[] {
+	/**
+	 * Retrieves all entities in the ECS.
+	 * @returns The list of all entities.
+	 */
+	getAllEntities(): number[] {
 		return this.entities.map((_, entity) => entity);
+	}
+}
+
+export class SystemManager extends System {
+	private dependencyGraph: DependencyGraph = new DependencyGraph();
+
+	constructor(core: Core) {
+		super(core);
+	}
+
+	/**
+	 * Add a system to the Core
+	 * Updates the dependency graph with the new system.
+	 * @param system - The system to add.
+	 */
+	addSystem<T extends System>(system: T) {
+		this.dependencyGraph.addSystem(system);
+		return this.core.add(system);
+	}
+
+	/**
+	 * Add a dependency between two systems.
+	 * Updates the dependency graph with the new dependency.
+	 * @param system - The system to add the dependency to.
+	 * @param dependency - The dependency system.
+	 */
+	addDependency(system: System, dependency: System) {
+		this.dependencyGraph.addDependency(system, dependency);
+	}
+
+	/**
+	 * Update all systems in the SystemManager.
+	 * Updates systems in the order determined by the dependency graph.
+	 * @param deltaTime - The time elapsed since the last update call.
+	 */
+	update(deltaTime: number) {
+		this.dependencyGraph
+			.topologicalSort()
+			.map((system) => system.update(deltaTime));
 	}
 }
