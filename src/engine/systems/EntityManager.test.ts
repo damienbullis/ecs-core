@@ -1,12 +1,17 @@
-import { describe, test, expect } from 'bun:test';
+import { beforeEach, describe, test, expect } from 'bun:test';
 import { EntityManager } from '.';
 import { PlayerEntityState, TurnCount } from '../components';
+import { Core } from '../core';
 
-const EM = EntityManager.bind(null, null as any);
+let core: Core;
+let em: EntityManager;
+beforeEach(() => {
+	core = new Core();
+	em = new EntityManager(core);
+});
 
 describe('Entity Manager', () => {
 	test('Creates entities', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		em.addComponent(
 			entity,
@@ -17,7 +22,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Destroys entities', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		em.addComponent(
 			entity,
@@ -31,7 +35,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Adds component', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		const Turn = new TurnCount();
 
@@ -47,7 +50,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Adds multiple components', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -59,7 +61,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Removes component', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -74,7 +75,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Removes multiple components', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -89,7 +89,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Get entities with components', () => {
-		const em = new EM();
 		const entity1 = em.createEntity();
 		const entity2 = em.createEntity();
 		const Turn = new TurnCount();
@@ -110,7 +109,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Has component', () => {
-		const em = new EM();
 		const entity = em.createEntity();
 		const Turn = new TurnCount();
 		const Player = new PlayerEntityState({ teamId: 0, id: entity });
@@ -126,7 +124,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Get all entities', () => {
-		const em = new EM();
 		const entity1 = em.createEntity();
 
 		expect(em.getAllEntities()).toEqual([entity1]);
@@ -136,8 +133,6 @@ describe('Entity Manager', () => {
 	});
 
 	test('Pools entities', () => {
-		const em = new EM();
-
 		const entity1 = em.createEntity();
 		em.destroyEntity(entity1);
 		const entity2 = em.createEntity();

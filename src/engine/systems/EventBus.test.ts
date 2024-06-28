@@ -4,12 +4,11 @@ import { Core } from '../core';
 
 describe('EventBus', () => {
 	const ecs = new Core();
-	const eventBus = new EventBus(ecs);
+	const eventBus = ecs.add(new EventBus(ecs));
 
 	test('Can add system to core', () => {
-		ecs.addSystem(eventBus);
-		const systems = ecs.getSystem(EventBus);
-		expect(systems).toBe(eventBus);
+		const systems = ecs.get(EventBus);
+		expect(systems).toEqual([eventBus]);
 	});
 
 	const fn = jest.fn();

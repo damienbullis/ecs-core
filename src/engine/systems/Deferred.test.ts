@@ -1,25 +1,25 @@
 import { describe, expect, test, spyOn } from 'bun:test';
-import { Deferred, EntityManager } from '.';
+import { Deferred, EntityManager, SystemManager, type Component } from '.';
 import { Core } from '../core';
-import { Component } from '../types';
 
 describe('Deferred', () => {
 	const core = new Core();
-	const em = new EntityManager(core);
+	const em = core.add(new EntityManager(core));
+	const sm = core.add(new SystemManager(core));
 
 	const deferredSystem = new Deferred(core, em);
 
 	test('Can add system to core', () => {
-		core.addSystem(deferredSystem);
-		const system = core.getSystem(Deferred);
-		expect(system).toBe(deferredSystem);
+		sm.addSystem(deferredSystem);
+		const system = core.get(Deferred);
+		expect(system).toEqual([deferredSystem]);
 	});
 
 	test('should defer the creation of an entity', () => {
 		const createEntitySpy = spyOn(em, 'createEntity');
 		deferredSystem.deferCreate();
 		expect(createEntitySpy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.update(0);
 		expect(createEntitySpy).toHaveBeenCalled();
 	});
 
@@ -28,7 +28,7 @@ describe('Deferred', () => {
 		const mockEntity = 1;
 		deferredSystem.deferDestroy(mockEntity);
 		expect(destroyEntitySpy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.update(0);
 		expect(destroyEntitySpy).toHaveBeenCalledWith(mockEntity);
 	});
 
@@ -38,7 +38,7 @@ describe('Deferred', () => {
 		const mockComponent: Component = {};
 		deferredSystem.deferAdd(mockEntity, mockComponent);
 		expect(spy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.update(0);
 		expect(spy).toHaveBeenCalledWith(mockEntity, mockComponent);
 	});
 
@@ -48,7 +48,7 @@ describe('Deferred', () => {
 		const mockComponent: Component = {};
 		deferredSystem.deferRemove(mockEntity, mockComponent);
 		expect(spy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.update(0);
 		expect(spy).toHaveBeenCalledWith(mockEntity, mockComponent);
 	});
 
@@ -71,7 +71,7 @@ describe('Deferred', () => {
 		expect(addComponentSpy).toHaveBeenCalledTimes(1);
 		expect(removeComponentSpy).toHaveBeenCalledTimes(1);
 
-		core.update(0);
+		sm.update(0);
 
 		expect(createEntitySpy).toHaveBeenCalledTimes(2);
 		expect(destroyEntitySpy).toHaveBeenCalledTimes(2);
