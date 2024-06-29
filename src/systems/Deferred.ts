@@ -1,4 +1,4 @@
-import { Core, System } from '../core';
+import { System } from '../core';
 import { Component, EntityManager } from './EntityManager';
 
 export class Deferred extends System {
@@ -6,8 +6,8 @@ export class Deferred extends System {
 	private currentIndex = 0;
 	private entityManager: EntityManager;
 
-	constructor(core: Core, entityManager: EntityManager) {
-		super(core);
+	constructor(entityManager: EntityManager) {
+		super();
 		this.entityManager = entityManager;
 	}
 

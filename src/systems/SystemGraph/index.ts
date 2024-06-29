@@ -3,9 +3,11 @@ import { DependencyGraph } from './DependencyGraph';
 
 export class SystemGraph extends System {
 	private dependencyGraph: DependencyGraph = new DependencyGraph();
+	private core: Core;
 
 	constructor(core: Core) {
-		super(core);
+		super();
+		this.core = core;
 	}
 
 	/**

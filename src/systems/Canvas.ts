@@ -1,4 +1,4 @@
-import { Core, System } from '../core';
+import { System } from '../core';
 import { EntityManager } from './EntityManager';
 import { CanvasComponent } from './EntityManager/components';
 
@@ -15,8 +15,8 @@ export class Canvas extends System {
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 
-	constructor(core: Core, entityManager: EntityManager) {
-		super(core);
+	constructor(entityManager: EntityManager) {
+		super();
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 

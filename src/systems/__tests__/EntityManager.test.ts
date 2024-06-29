@@ -1,13 +1,10 @@
 import { beforeEach, describe, test, expect } from 'bun:test';
 import { EntityManager } from '../EntityManager';
-import { Core } from '../../core';
 import { PlayerEntityState, TurnCount } from '../EntityManager/components';
 
-let core: Core;
 let em: EntityManager;
 beforeEach(() => {
-	core = new Core();
-	em = new EntityManager(core);
+	em = new EntityManager();
 });
 
 describe('Entity Manager', () => {

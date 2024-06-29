@@ -3,10 +3,6 @@
  * @class
  */
 export abstract class System {
-	constructor(protected core: Core) {
-		this.core = core;
-	}
-
 	/**
 	 * Update the system.
 	 * @param deltaTime - The time elapsed since the last update call.

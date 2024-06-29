@@ -1,4 +1,4 @@
-import { Core, System } from '../../core';
+import { System } from '../../core';
 
 /**
  * Base interface for components.
@@ -12,9 +12,6 @@ export class EntityManager extends System {
 	private entities: Map<Function, Component[]>[] = [];
 	private componentEntityMap: Map<Function, number[]> = new Map();
 
-	constructor(core: Core) {
-		super(core);
-	}
 	// Do nothing
 	run() {}
 

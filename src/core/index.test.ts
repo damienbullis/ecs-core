@@ -3,8 +3,8 @@ import { expect, test, describe } from 'bun:test';
 import { Core, System } from '.';
 
 const S = class extends System {
-	constructor(ecs: Core) {
-		super(ecs);
+	constructor() {
+		super();
 	}
 
 	run() {}
@@ -12,7 +12,7 @@ const S = class extends System {
 describe('ECS Core', () => {
 	test('Add system', () => {
 		const core = new Core();
-		const system = core.add(new S(core));
+		const system = core.add(new S());
 		const [added] = core.get(S);
 
 		expect(added).toBe(system);
@@ -20,7 +20,7 @@ describe('ECS Core', () => {
 
 	test('Get systems', () => {
 		const core = new Core();
-		const s = core.add(new S(core));
+		const s = core.add(new S());
 		const [added] = core.get(S);
 
 		expect(added).toBe(s);

@@ -1,10 +1,10 @@
-import { Core, System } from '../core';
+import { System } from '../core';
 
 export class EventBus extends System {
 	private channels: { [key: string]: ((data?: any) => void)[] } = {};
 
-	constructor(core: Core) {
-		super(core);
+	constructor() {
+		super();
 	}
 
 	/**

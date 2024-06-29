@@ -24,13 +24,13 @@ global.window = {
 };
 
 describe('Canvas', () => {
-	const ecs = new Core();
-	const sm = ecs.add(new SystemGraph(ecs));
-	const em = sm.addSystem(new EntityManager(ecs));
-	const canvas = sm.addSystem(new Canvas(ecs, em));
+	const core = new Core();
+	const sm = core.add(new SystemGraph(core));
+	const em = sm.addSystem(new EntityManager());
+	const canvas = sm.addSystem(new Canvas(em));
 
 	test('Add canvas system to core', () => {
-		expect(ecs.get(Canvas)[0]).toBe(canvas);
+		expect(core.get(Canvas)[0]).toBe(canvas);
 	});
 
 	test('Creates a canvas element', () => {
@@ -43,7 +43,7 @@ describe('Canvas', () => {
 	});
 
 	test('Updates the canvas system', () => {
-		const [canvas] = ecs.get(Canvas);
+		const [canvas] = core.get(Canvas);
 		const update = jest.fn();
 
 		//@ts-expect-error - jest.fn() is a mock function

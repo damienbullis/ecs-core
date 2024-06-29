@@ -1,4 +1,4 @@
-import { Core, System } from '../core';
+import { System } from '../core';
 import { EntityManager } from './EntityManager';
 import { PlayerEntityState, SpaceState } from './EntityManager/components';
 
@@ -11,8 +11,8 @@ const INIT_SIZE = 14;
  * - add locations to players & players to locations
  */
 export class InitSpaces extends System {
-	constructor(ecs: Core, em: EntityManager, ...players: number[]) {
-		super(ecs);
+	constructor(em: EntityManager, ...players: number[]) {
+		super();
 
 		const playerEntities = players.map((p) =>
 			em.getComponent(p, PlayerEntityState),

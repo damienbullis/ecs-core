@@ -3,11 +3,11 @@ import { Core } from '../../core';
 import { EventBus } from '../EventBus';
 
 describe('EventBus', () => {
-	const ecs = new Core();
-	const eventBus = ecs.add(new EventBus(ecs));
+	const core = new Core();
+	const eventBus = core.add(new EventBus());
 
 	test('Can add system to core', () => {
-		const systems = ecs.get(EventBus);
+		const systems = core.get(EventBus);
 		expect(systems).toEqual([eventBus]);
 	});
 

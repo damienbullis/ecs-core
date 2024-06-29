@@ -4,10 +4,10 @@ import { SystemGraph } from '../SystemGraph';
 
 describe('SystemManager', () => {
 	test('Add system to core', () => {
-		const ecs = new Core();
-		const sm = ecs.add(new SystemGraph(ecs));
+		const core = new Core();
+		const sm = core.add(new SystemGraph(core));
 
-		const [added] = ecs.get(SystemGraph);
+		const [added] = core.get(SystemGraph);
 
 		expect(added).toBe(sm);
 	});
@@ -17,35 +17,26 @@ describe('SystemManager', () => {
 		const order: string[] = [];
 
 		class SystemA extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('A');
 			}
 		}
 
 		class SystemB extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('B');
 			}
 		}
 
 		class SystemC extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('C');
 			}
 		}
 
-		const systemA = new SystemA(core);
-		const systemB = new SystemB(core);
-		const systemC = new SystemC(core);
+		const systemA = new SystemA();
+		const systemB = new SystemB();
+		const systemC = new SystemC();
 
 		sm.addSystem(systemA);
 		sm.addSystem(systemB);
@@ -66,35 +57,26 @@ describe('SystemManager', () => {
 		const order: string[] = [];
 
 		class SystemA extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('A');
 			}
 		}
 
 		class SystemB extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('B');
 			}
 		}
 
 		class SystemC extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {
 				order.push('C');
 			}
 		}
 
-		const systemA = new SystemA(core);
-		const systemB = new SystemB(core);
-		const systemC = new SystemC(core);
+		const systemA = new SystemA();
+		const systemB = new SystemB();
+		const systemC = new SystemC();
 
 		sm.addSystem(systemA);
 		sm.addSystem(systemB);
@@ -110,21 +92,15 @@ describe('SystemManager', () => {
 		const sm = new SystemGraph(core);
 
 		class SystemA extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {}
 		}
 
 		class SystemB extends System {
-			constructor(ecs: Core) {
-				super(ecs);
-			}
 			run(_: number) {}
 		}
 
-		const systemA = new SystemA(core);
-		const systemB = new SystemB(core);
+		const systemA = new SystemA();
+		const systemB = new SystemB();
 
 		sm.addSystem(systemA);
 		sm.addSystem(systemB);

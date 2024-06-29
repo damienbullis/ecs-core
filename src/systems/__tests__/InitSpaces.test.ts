@@ -6,14 +6,14 @@ import { InitSpaces } from '../InitSpaces';
 
 describe('InitSpaces', () => {
 	const core = new Core();
-	const em = core.add(new EntityManager(core));
+	const em = core.add(new EntityManager());
 	const player = em.createEntity();
 
 	em.addComponent(player, new PlayerEntityState({ teamId: 0, id: player }));
 	const ai = em.createEntity();
 	em.addComponent(ai, new PlayerEntityState({ teamId: 1, id: ai }));
 
-	const initSpaces = core.add(new InitSpaces(core, em, player, ai));
+	const initSpaces = core.add(new InitSpaces(em, player, ai));
 
 	const playerState = em.getComponent(player, PlayerEntityState);
 	const aiState = em.getComponent(ai, PlayerEntityState);

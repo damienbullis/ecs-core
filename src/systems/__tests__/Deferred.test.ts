@@ -6,10 +6,10 @@ import { Deferred } from '../Deferred';
 
 describe('Deferred', () => {
 	const core = new Core();
-	const em = core.add(new EntityManager(core));
+	const em = core.add(new EntityManager());
 	const sm = core.add(new SystemGraph(core));
 
-	const deferredSystem = new Deferred(core, em);
+	const deferredSystem = new Deferred(em);
 
 	test('Can add system to core', () => {
 		sm.addSystem(deferredSystem);
