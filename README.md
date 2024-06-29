@@ -25,8 +25,8 @@ However in this model, resources should be handled by the systems themselves.
 ```ts
 // Create a system
 class Example extends System {
-	constructor(core: Core) {
-		super(core);
+	constructor() {
+		super();
 		// Initialize the system
 	}
 
