@@ -1,6 +1,6 @@
 import { expect, test, describe } from 'bun:test';
 
-import { Core, System } from './core';
+import { Core, System } from '.';
 
 const S = class extends System {
 	constructor(ecs: Core) {
