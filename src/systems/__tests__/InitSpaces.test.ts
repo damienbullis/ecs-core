@@ -1,26 +1,27 @@
 import { expect, describe, test } from 'bun:test';
-import { EntityManager, InitSpaces } from '.';
-import { Core } from '../core';
-import { PlayerEntityState, SpaceState } from '../components';
+import { Core } from '../../core';
+import { EntityManager } from '../EntityManager';
+import { PlayerEntityState, SpaceState } from '../EntityManager/components';
+import { InitSpaces } from '../InitSpaces';
 
 describe('InitSpaces', () => {
 	const core = new Core();
-	const em = new EntityManager(core);
+	const em = core.add(new EntityManager());
 	const player = em.createEntity();
 
 	em.addComponent(player, new PlayerEntityState({ teamId: 0, id: player }));
 	const ai = em.createEntity();
 	em.addComponent(ai, new PlayerEntityState({ teamId: 1, id: ai }));
 
-	const initSpaces = new InitSpaces(core, em, player, ai);
-	core.addSystem(initSpaces);
+	const initSpaces = core.add(new InitSpaces(em, player, ai));
 
 	const playerState = em.getComponent(player, PlayerEntityState);
 	const aiState = em.getComponent(ai, PlayerEntityState);
 
 	test('Can add system to core', () => {
-		const systems = core.getSystem(InitSpaces);
-		expect(systems).toBe(initSpaces);
+		const systems = core.get(InitSpaces);
+		expect(systems.length).toBe(1);
+		expect(systems).toEqual([initSpaces]);
 	});
 
 	test('Players have correct starting locations', () => {

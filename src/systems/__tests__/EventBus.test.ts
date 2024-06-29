@@ -1,15 +1,14 @@
 import { describe, expect, test, jest } from 'bun:test';
-import { EventBus } from '.';
-import { Core } from '../core';
+import { Core } from '../../core';
+import { EventBus } from '../EventBus';
 
 describe('EventBus', () => {
-	const ecs = new Core();
-	const eventBus = new EventBus(ecs);
+	const core = new Core();
+	const eventBus = core.add(new EventBus());
 
 	test('Can add system to core', () => {
-		ecs.addSystem(eventBus);
-		const systems = ecs.getSystem(EventBus);
-		expect(systems).toBe(eventBus);
+		const systems = core.get(EventBus);
+		expect(systems).toEqual([eventBus]);
 	});
 
 	const fn = jest.fn();

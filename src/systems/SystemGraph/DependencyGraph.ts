@@ -1,4 +1,4 @@
-import { System } from './core';
+import { System } from '../../core';
 
 export class DependencyGraph {
 	private adjList: Map<System, System[]> = new Map();

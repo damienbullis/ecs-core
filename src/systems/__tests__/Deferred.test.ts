@@ -1,17 +1,19 @@
 import { describe, expect, test, spyOn } from 'bun:test';
-import { Deferred, EntityManager } from '.';
-import { Core } from '../core';
-import { Component } from '../types';
+import { Core } from '../../core';
+import { Component, EntityManager } from '../EntityManager';
+import { SystemGraph } from '../SystemGraph';
+import { Deferred } from '../Deferred';
 
 describe('Deferred', () => {
 	const core = new Core();
-	const em = new EntityManager(core);
+	const em = core.add(new EntityManager());
+	const sm = core.add(new SystemGraph(core));
 
-	const deferredSystem = new Deferred(core, em);
+	const deferredSystem = new Deferred(em);
 
 	test('Can add system to core', () => {
-		core.addSystem(deferredSystem);
-		const system = core.getSystem(Deferred);
+		sm.addSystem(deferredSystem);
+		const [system] = core.get(Deferred);
 		expect(system).toBe(deferredSystem);
 	});
 
@@ -19,7 +21,7 @@ describe('Deferred', () => {
 		const createEntitySpy = spyOn(em, 'createEntity');
 		deferredSystem.deferCreate();
 		expect(createEntitySpy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.run(0);
 		expect(createEntitySpy).toHaveBeenCalled();
 	});
 
@@ -28,7 +30,7 @@ describe('Deferred', () => {
 		const mockEntity = 1;
 		deferredSystem.deferDestroy(mockEntity);
 		expect(destroyEntitySpy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.run(0);
 		expect(destroyEntitySpy).toHaveBeenCalledWith(mockEntity);
 	});
 
@@ -38,7 +40,7 @@ describe('Deferred', () => {
 		const mockComponent: Component = {};
 		deferredSystem.deferAdd(mockEntity, mockComponent);
 		expect(spy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.run(0);
 		expect(spy).toHaveBeenCalledWith(mockEntity, mockComponent);
 	});
 
@@ -48,11 +50,11 @@ describe('Deferred', () => {
 		const mockComponent: Component = {};
 		deferredSystem.deferRemove(mockEntity, mockComponent);
 		expect(spy).not.toHaveBeenCalled();
-		core.update(0);
+		sm.run(0);
 		expect(spy).toHaveBeenCalledWith(mockEntity, mockComponent);
 	});
 
-	test('should execute deferred operations at the end of the frame', () => {
+	test('should clear deferred queue on run', () => {
 		const createEntitySpy = spyOn(em, 'createEntity');
 		const destroyEntitySpy = spyOn(em, 'destroyEntity');
 		const addComponentSpy = spyOn(em, 'addComponent');
@@ -71,7 +73,7 @@ describe('Deferred', () => {
 		expect(addComponentSpy).toHaveBeenCalledTimes(1);
 		expect(removeComponentSpy).toHaveBeenCalledTimes(1);
 
-		core.update(0);
+		sm.run(0);
 
 		expect(createEntitySpy).toHaveBeenCalledTimes(2);
 		expect(destroyEntitySpy).toHaveBeenCalledTimes(2);
