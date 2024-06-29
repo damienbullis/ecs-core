@@ -3,10 +3,6 @@ import { expect, test, describe } from 'bun:test';
 import { Core, System } from '.';
 
 const S = class extends System {
-	constructor() {
-		super();
-	}
-
 	run() {}
 };
 describe('ECS Core', () => {
@@ -25,12 +21,4 @@ describe('ECS Core', () => {
 
 		expect(added).toBe(s);
 	});
-
-	// test('Update systems', async () => {
-	// 	const ecs = new Core();
-	// 	ecs.addSystem(new S(ecs));
-	// 	ecs.update(0);
-
-	// 	expect(fn).toHaveBeenCalledWith(0);
-	// });
 });

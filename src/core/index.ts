@@ -13,7 +13,7 @@ export abstract class System {
 /**
  * Core Engine
  *
- * This is a variant of an ECS Engine, not sure what to call this, maybe just Systems Pattern
+ * This is a variant of an ECS Engine, not sure what to call this, maybe just Systems Core...
  */
 export class Core<S = System> {
 	private systems: S[] = [];
