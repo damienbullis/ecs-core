@@ -1,26 +1,26 @@
 import { describe, expect, test } from 'bun:test';
-import { Core, System } from '../core';
-import { SystemManager } from '.';
+import { Core, System } from '../../core';
+import { SystemGraph } from '../SystemGraph';
 
 describe('SystemManager', () => {
 	test('Add system to core', () => {
 		const ecs = new Core();
-		const sm = ecs.add(new SystemManager(ecs));
+		const sm = ecs.add(new SystemGraph(ecs));
 
-		const [added] = ecs.get(SystemManager);
+		const [added] = ecs.get(SystemGraph);
 
 		expect(added).toBe(sm);
 	});
 	test('Systems execute in correct order', async () => {
 		const core = new Core();
-		const sm = core.add(new SystemManager(core));
+		const sm = core.add(new SystemGraph(core));
 		const order: string[] = [];
 
 		class SystemA extends System {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('A');
 			}
 		}
@@ -29,7 +29,7 @@ describe('SystemManager', () => {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('B');
 			}
 		}
@@ -38,7 +38,7 @@ describe('SystemManager', () => {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('C');
 			}
 		}
@@ -55,21 +55,21 @@ describe('SystemManager', () => {
 		sm.addDependency(systemA, systemB);
 		sm.addDependency(systemB, systemC);
 
-		sm.update(0);
+		sm.run(0);
 
 		expect(order).toEqual(['C', 'B', 'A']);
 	});
 
 	test('Handles multiple independent systems', async () => {
 		const core = new Core();
-		const sm = new SystemManager(core);
+		const sm = new SystemGraph(core);
 		const order: string[] = [];
 
 		class SystemA extends System {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('A');
 			}
 		}
@@ -78,7 +78,7 @@ describe('SystemManager', () => {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('B');
 			}
 		}
@@ -87,7 +87,7 @@ describe('SystemManager', () => {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {
+			run(_: number) {
 				order.push('C');
 			}
 		}
@@ -100,27 +100,27 @@ describe('SystemManager', () => {
 		sm.addSystem(systemB);
 		sm.addSystem(systemC);
 
-		sm.update(0);
+		sm.run(0);
 
 		expect(order).toEqual(expect.arrayContaining(['A', 'B', 'C']));
 	});
 
 	test('Cycles in dependencies throw error', () => {
 		const core = new Core();
-		const sm = new SystemManager(core);
+		const sm = new SystemGraph(core);
 
 		class SystemA extends System {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {}
+			run(_: number) {}
 		}
 
 		class SystemB extends System {
 			constructor(ecs: Core) {
 				super(ecs);
 			}
-			update(_: number) {}
+			run(_: number) {}
 		}
 
 		const systemA = new SystemA(core);
@@ -133,8 +133,6 @@ describe('SystemManager', () => {
 		sm.addDependency(systemA, systemB);
 		sm.addDependency(systemB, systemA);
 
-		expect(() => sm.update(0)).toThrow(
-			'Cycle detected in dependency graph',
-		);
+		expect(() => sm.run(0)).toThrow('Cycle detected in dependency graph');
 	});
 });

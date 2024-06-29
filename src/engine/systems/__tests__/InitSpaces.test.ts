@@ -1,7 +1,8 @@
 import { expect, describe, test } from 'bun:test';
-import { EntityManager, InitSpaces } from '.';
-import { Core } from '../core';
-import { PlayerEntityState, SpaceState } from '../components';
+import { Core } from '../../core';
+import { EntityManager } from '../EntityManager';
+import { PlayerEntityState, SpaceState } from '../EntityManager/components';
+import { InitSpaces } from '../InitSpaces';
 
 describe('InitSpaces', () => {
 	const core = new Core();

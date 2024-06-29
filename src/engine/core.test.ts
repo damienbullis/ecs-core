@@ -7,7 +7,7 @@ const S = class extends System {
 		super(ecs);
 	}
 
-	update() {}
+	run() {}
 };
 describe('ECS Core', () => {
 	test('Add system', () => {

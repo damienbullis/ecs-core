@@ -1,7 +1,7 @@
 import { beforeEach, describe, test, expect } from 'bun:test';
-import { EntityManager } from '.';
-import { PlayerEntityState, TurnCount } from '../components';
-import { Core } from '../core';
+import { EntityManager } from '../EntityManager';
+import { Core } from '../../core';
+import { PlayerEntityState, TurnCount } from '../EntityManager/components';
 
 let core: Core;
 let em: EntityManager;

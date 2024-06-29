@@ -1,6 +1,8 @@
 import { describe, test, expect, jest } from 'bun:test';
-import { Canvas, EntityManager, SystemManager } from './';
-import { Core } from '../core';
+import { Core } from '../../core';
+import { SystemGraph } from '../SystemGraph';
+import { EntityManager } from '../EntityManager';
+import { Canvas } from '../Canvas';
 
 // polyfill document and window
 global.document = {
@@ -23,7 +25,7 @@ global.window = {
 
 describe('Canvas', () => {
 	const ecs = new Core();
-	const sm = ecs.add(new SystemManager(ecs));
+	const sm = ecs.add(new SystemGraph(ecs));
 	const em = sm.addSystem(new EntityManager(ecs));
 	const canvas = sm.addSystem(new Canvas(ecs, em));
 
@@ -47,7 +49,7 @@ describe('Canvas', () => {
 		//@ts-expect-error - jest.fn() is a mock function
 		canvas.context.clearRect = update;
 
-		sm.update(0);
+		sm.run(0);
 
 		expect(update).toHaveBeenCalled();
 	});

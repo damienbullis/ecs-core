@@ -1,6 +1,6 @@
 import { describe, expect, test, jest } from 'bun:test';
-import { EventBus } from '.';
-import { Core } from '../core';
+import { Core } from '../../core';
+import { EventBus } from '../EventBus';
 
 describe('EventBus', () => {
 	const ecs = new Core();
