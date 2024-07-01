@@ -1,4 +1,4 @@
-import { Component } from '../systems/EntityAdapter';
+import { Component } from '../';
 
 export class TurnCount implements Component {
 	turnCount = 0;

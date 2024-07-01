@@ -1,6 +1,6 @@
 import { beforeEach, describe, test, expect } from 'bun:test';
 import { EntityManager } from '../EntityAdapter/EntityManager';
-import { PlayerEntityState, TurnCount } from '../../components';
+import { PlayerEntityState, TurnCount } from '../EntityAdapter';
 
 let em: EntityManager;
 beforeEach(() => {

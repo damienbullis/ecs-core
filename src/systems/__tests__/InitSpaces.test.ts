@@ -1,8 +1,7 @@
 import { expect, describe, test } from 'bun:test';
 import { Core } from '../../core';
-import { EntityAdapter } from '../EntityAdapter';
+import { EntityAdapter, PlayerEntityState, SpaceState } from '../EntityAdapter';
 import { InitSpaces } from '../InitSpaces';
-import { PlayerEntityState, SpaceState } from '../../components';
 
 describe('InitSpaces', () => {
 	const core = new Core();

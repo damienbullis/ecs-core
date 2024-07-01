@@ -1,6 +1,5 @@
-import { CanvasComponent } from '../components';
 import { System } from '../core';
-import { EntityAdapter } from './EntityAdapter';
+import { EntityAdapter, CanvasComponent } from './EntityAdapter';
 
 /**
  * System to initialize the Canvas.
