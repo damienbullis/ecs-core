@@ -1,4 +1,4 @@
-import { Component } from '../core';
+import { Component } from '../';
 
 export class TurnCount implements Component {
 	turnCount = 0;
@@ -33,10 +33,11 @@ export class SpaceState implements Component {
 }
 
 export class CanvasComponent implements Component {
-	canvas: HTMLCanvasElement;
-	ctx: CanvasRenderingContext2D;
+	element: HTMLCanvasElement;
+	context: CanvasRenderingContext2D;
+
 	constructor(canvas: HTMLCanvasElement) {
-		this.canvas = canvas;
-		this.ctx = canvas.getContext('2d')!;
+		this.element = canvas;
+		this.context = canvas.getContext('2d')!;
 	}
 }
