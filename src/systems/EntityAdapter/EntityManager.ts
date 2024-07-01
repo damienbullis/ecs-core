@@ -1,19 +1,14 @@
-import { System } from '../../core';
-
 /**
  * Base interface for components.
  * @interface
  */
 export interface Component {}
 
-export class EntityManager extends System {
+export class EntityManager {
 	private nextEntityId = 0;
 	private entityPool: number[] = [];
 	private entities: Map<Function, Component[]>[] = [];
 	private componentEntityMap: Map<Function, number[]> = new Map();
-
-	// Do nothing
-	run() {}
 
 	/**
 	 * Creates a new entity.
