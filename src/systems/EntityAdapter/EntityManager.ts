@@ -1,4 +1,4 @@
-import { System } from '../../../core';
+import { System } from '../../core';
 
 /**
  * Base interface for components.

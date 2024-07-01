@@ -79,9 +79,3 @@ export class EntityAdapter extends System {
 }
 
 export type { Component };
-export {
-	CanvasComponent,
-	PlayerEntityState,
-	SpaceState,
-	TurnCount,
-} from './EntityManager/components';

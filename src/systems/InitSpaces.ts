@@ -1,5 +1,7 @@
 import { System } from '../core';
-import { EntityAdapter, PlayerEntityState, SpaceState } from './EntityAdapter';
+
+import { PlayerEntityState, SpaceState } from '../components';
+import { EntityAdapter } from './EntityAdapter';
 
 const INIT_SIZE = 14;
 
