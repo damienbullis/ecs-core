@@ -1,12 +1,12 @@
 import { describe, expect, test, spyOn } from 'bun:test';
 import { Core } from '../../core';
-import { Component, EntityManager } from '../EntityManager';
+import { Component, EntityAdapter } from '../EntityAdapter';
 import { SystemGraph } from '../SystemGraph';
 import { Deferred } from '../Deferred';
 
 describe('Deferred', () => {
 	const core = new Core();
-	const em = core.add(new EntityManager());
+	const em = core.add(new EntityAdapter());
 	const sm = core.add(new SystemGraph(core));
 
 	const deferredSystem = new Deferred(em);
@@ -18,7 +18,7 @@ describe('Deferred', () => {
 	});
 
 	test('should defer the creation of an entity', () => {
-		const createEntitySpy = spyOn(em, 'createEntity');
+		const createEntitySpy = spyOn(em, 'create');
 		deferredSystem.deferCreate();
 		expect(createEntitySpy).not.toHaveBeenCalled();
 		sm.run(0);
@@ -26,7 +26,7 @@ describe('Deferred', () => {
 	});
 
 	test('should defer the destruction of an entity', () => {
-		const destroyEntitySpy = spyOn(em, 'destroyEntity');
+		const destroyEntitySpy = spyOn(em, 'destroy');
 		const mockEntity = 1;
 		deferredSystem.deferDestroy(mockEntity);
 		expect(destroyEntitySpy).not.toHaveBeenCalled();
@@ -35,7 +35,7 @@ describe('Deferred', () => {
 	});
 
 	test('should defer adding a component to an entity', () => {
-		const spy = spyOn(em, 'addComponent');
+		const spy = spyOn(em, 'add');
 		const mockEntity = 1;
 		const mockComponent: Component = {};
 		deferredSystem.deferAdd(mockEntity, mockComponent);
@@ -45,7 +45,7 @@ describe('Deferred', () => {
 	});
 
 	test('should defer removing a component from an entity', () => {
-		const spy = spyOn(em, 'removeComponent');
+		const spy = spyOn(em, 'remove');
 		const mockEntity = 1;
 		const mockComponent: Component = {};
 		deferredSystem.deferRemove(mockEntity, mockComponent);
@@ -55,10 +55,10 @@ describe('Deferred', () => {
 	});
 
 	test('should clear deferred queue on run', () => {
-		const createEntitySpy = spyOn(em, 'createEntity');
-		const destroyEntitySpy = spyOn(em, 'destroyEntity');
-		const addComponentSpy = spyOn(em, 'addComponent');
-		const removeComponentSpy = spyOn(em, 'removeComponent');
+		const createEntitySpy = spyOn(em, 'create');
+		const destroyEntitySpy = spyOn(em, 'destroy');
+		const addComponentSpy = spyOn(em, 'add');
+		const removeComponentSpy = spyOn(em, 'remove');
 
 		const mockEntity = 1;
 		const mockComponent: Component = {};

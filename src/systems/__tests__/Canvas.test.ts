@@ -1,7 +1,7 @@
 import { describe, test, expect, jest } from 'bun:test';
 import { Core } from '../../core';
 import { SystemGraph } from '../SystemGraph';
-import { EntityManager } from '../EntityManager';
+import { EntityAdapter } from '../EntityAdapter';
 import { Canvas } from '../Canvas';
 
 // polyfill document and window
@@ -26,7 +26,7 @@ global.window = {
 describe('Canvas', () => {
 	const core = new Core();
 	const sm = core.add(new SystemGraph(core));
-	const em = sm.addSystem(new EntityManager());
+	const em = sm.addSystem(new EntityAdapter());
 	const canvas = sm.addSystem(new Canvas(em));
 
 	test('Add canvas system to core', () => {

@@ -1,6 +1,5 @@
 import { System } from '../core';
-import { EntityManager } from './EntityManager';
-import { CanvasComponent } from './EntityManager/components';
+import { EntityAdapter, CanvasComponent } from './EntityAdapter';
 
 /**
  * System to initialize the Canvas.
@@ -15,13 +14,13 @@ export class Canvas extends System {
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 
-	constructor(entityManager: EntityManager) {
+	constructor(entityManager: EntityAdapter) {
 		super();
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 
-		entityManager.addComponent(
-			entityManager.createEntity(),
+		entityManager.add(
+			entityManager.create(),
 			new CanvasComponent(this.canvas),
 		);
 

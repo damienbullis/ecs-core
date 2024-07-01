@@ -1,4 +1,4 @@
-import { System } from '../../core';
+import { System } from '../../../core';
 
 /**
  * Base interface for components.
@@ -229,10 +229,10 @@ export class EntityManager extends System {
 	}
 
 	/**
-	 * Retrieves all entities in the ECS.
+	 * Retrieves all entities.
 	 * @returns The list of all entities.
 	 */
-	getAllEntities(): number[] {
-		return this.entities.map((_, entity) => entity);
+	getAllEntities() {
+		return this.entities;
 	}
 }

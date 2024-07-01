@@ -1,12 +1,12 @@
 import { System } from '../core';
-import { Component, EntityManager } from './EntityManager';
+import { Component, EntityAdapter } from './EntityAdapter';
 
 export class Deferred extends System {
 	private deferred: (() => void)[] = [];
 	private currentIndex = 0;
-	private entityManager: EntityManager;
+	private entityManager: EntityAdapter;
 
-	constructor(entityManager: EntityManager) {
+	constructor(entityManager: EntityAdapter) {
 		super();
 		this.entityManager = entityManager;
 	}
@@ -38,7 +38,7 @@ export class Deferred extends System {
 	deferCreate(): void {
 		this.defer(() => {
 			try {
-				this.entityManager.createEntity();
+				this.entityManager.create();
 			} catch (error) {
 				console.error('Error creating entity:', error);
 			}
@@ -52,7 +52,7 @@ export class Deferred extends System {
 	deferDestroy(entity: number): void {
 		this.defer(() => {
 			try {
-				this.entityManager.destroyEntity(entity);
+				this.entityManager.destroy(entity);
 			} catch (error) {
 				console.error('Error destroying entity:', error);
 			}
@@ -67,7 +67,7 @@ export class Deferred extends System {
 	deferAdd(entity: number, component: Component): void {
 		this.defer(() => {
 			try {
-				this.entityManager.addComponent(entity, component);
+				this.entityManager.add(entity, component);
 			} catch (error) {
 				console.error('Error adding component:', error);
 			}
@@ -82,7 +82,7 @@ export class Deferred extends System {
 	deferRemove(entity: number, component: Component): void {
 		this.defer(() => {
 			try {
-				this.entityManager.removeComponent(entity, component);
+				this.entityManager.remove(entity, component);
 			} catch (error) {
 				console.error('Error removing component:', error);
 			}

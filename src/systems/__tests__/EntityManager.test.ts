@@ -1,6 +1,6 @@
 import { beforeEach, describe, test, expect } from 'bun:test';
-import { EntityManager } from '../EntityManager';
-import { PlayerEntityState, TurnCount } from '../EntityManager/components';
+import { EntityManager } from '../EntityAdapter/EntityManager';
+import { PlayerEntityState, TurnCount } from '../EntityAdapter';
 
 let em: EntityManager;
 beforeEach(() => {
@@ -15,7 +15,7 @@ describe('Entity Manager', () => {
 			new PlayerEntityState({ teamId: 0, id: entity }),
 		);
 		expect(entity).toBe(0);
-		expect(em.getAllEntities()).toEqual([0]);
+		expect(em.getAllEntities()[entity].size).toBe(1);
 	});
 
 	test('Destroys entities', () => {
@@ -24,7 +24,7 @@ describe('Entity Manager', () => {
 			entity,
 			new PlayerEntityState({ teamId: 0, id: entity }),
 		);
-		expect(em.getAllEntities()).toEqual([0]);
+		expect(em.getAllEntities()[entity].size).toBe(1);
 		expect(em.getEntitiesWithComponents(PlayerEntityState)).toEqual([0]);
 		em.destroyEntity(entity);
 		expect(em.getAllEntities()).toEqual([]);
@@ -123,10 +123,13 @@ describe('Entity Manager', () => {
 	test('Get all entities', () => {
 		const entity1 = em.createEntity();
 
-		expect(em.getAllEntities()).toEqual([entity1]);
+		expect(em.getAllEntities().length).toEqual(1);
 
 		const entity2 = em.createEntity();
-		expect(em.getAllEntities()).toEqual([entity1, entity2]);
+		const ents = em.getAllEntities();
+		expect(ents.length).toEqual(2);
+		expect(ents[entity1].size).toBe(0);
+		expect(ents[entity2].size).toBe(0);
 	});
 
 	test('Pools entities', () => {

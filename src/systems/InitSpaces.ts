@@ -1,6 +1,5 @@
 import { System } from '../core';
-import { EntityManager } from './EntityManager';
-import { PlayerEntityState, SpaceState } from './EntityManager/components';
+import { EntityAdapter, PlayerEntityState, SpaceState } from './EntityAdapter';
 
 const INIT_SIZE = 14;
 
@@ -11,17 +10,17 @@ const INIT_SIZE = 14;
  * - add locations to players & players to locations
  */
 export class InitSpaces extends System {
-	constructor(em: EntityManager, ...players: number[]) {
+	constructor(entityAdapter: EntityAdapter, ...players: number[]) {
 		super();
 
 		const playerEntities = players.map((p) =>
-			em.getComponent(p, PlayerEntityState),
+			entityAdapter.get(p, PlayerEntityState),
 		);
 
 		let playerCount = 1;
 		const distance = Math.floor((INIT_SIZE - players.length) / 3);
 		for (let i = 0; i < INIT_SIZE; i++) {
-			const s = em.createEntity();
+			const s = entityAdapter.create();
 			const space = new SpaceState();
 			if (
 				playerCount * distance + players.length / 2 === i &&
@@ -38,7 +37,7 @@ export class InitSpaces extends System {
 			// set the initial state of the spaces
 			space.id = s;
 			space.location = i;
-			em.addComponent(s, space);
+			entityAdapter.add(s, space);
 		}
 	}
 
