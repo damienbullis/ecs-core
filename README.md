@@ -40,13 +40,9 @@ const core = new Core();
 core.add(new Example(core));
 ```
 
-#### Adapter Systems (Contracts)
+#### Adapter Systems
 
-An intermediary system that allows two systems to interact with each other. This is useful when you want to keep systems decoupled from each other.
-
-#### Composite Systems
-
-A system that contains other systems. This is useful when you want to keep systems together that need to interact with each other.
+An intermediary system that allows two systems to interact with each other.
 
 ---
 
@@ -54,8 +50,6 @@ A system that contains other systems. This is useful when you want to keep syste
 
 > Components & Entities in this model are handled by a system, so the core itself does not have a concept of components.
 
+You can keep components in a systems directory or as a sibling to the systems directory.
+
 ---
-
-## Usage
-
-1. Define a system
