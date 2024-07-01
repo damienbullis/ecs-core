@@ -55,25 +55,10 @@ export class EntityAdapter extends System {
 		return this.entityManager.getComponent(entity, type);
 	}
 
-	// /**
-	//  * Get an entity or entities.
-	//  */
-	// get(entity: number): Map<Function, Component[]>;
-	// get(entities: number[]): Map<Function, Component[]>[];
-	// get(): Map<Function, Component[]>[];
-	// get(e?: number | number[]) {
-	// 	if (e === undefined) return this.entityManager.getAllEntities();
-	// 	if (Array.isArray(e)) {
-	// 		const entities = this.entityManager.getAllEntities();
-	// 		return e.map((e) => entities[e]);
-	// 	}
-	// 	return this.entityManager.getAllEntities()[e];
-	// }
-
 	/**
 	 * Get entities with the specified components.
 	 */
-	with(...types: Array<Function>) {
+	with(...types: Array<Function>): number[] {
 		return this.entityManager.getEntitiesWithComponents(...types);
 	}
 }
