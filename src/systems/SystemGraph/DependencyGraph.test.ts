@@ -1,15 +1,10 @@
 import { beforeEach, test, describe, expect } from 'bun:test';
-import { Core, System } from '../../core';
+import { System } from '../../core';
 import { DependencyGraph } from './DependencyGraph';
 
 describe('DependencyGraph', () => {
 	class TestSystem extends System {
-		constructor() {
-			super(new Core());
-		}
-		run() {
-			// Do nothing
-		}
+		run() {}
 	}
 	let graph: DependencyGraph;
 	beforeEach(() => {
