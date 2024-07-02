@@ -1,17 +1,17 @@
-import { test, describe, expect } from 'bun:test';
-import { DependencyGraph } from './utils';
-import { System } from './core';
+import { beforeEach, test, describe, expect } from 'bun:test';
+import { System } from '../../core';
+import { DependencyGraph } from './DependencyGraph';
 
 describe('DependencyGraph', () => {
 	class TestSystem extends System {
-		constructor() {
-			super(null as any); // Mocking ECS reference
-		}
-		update(_: number): void {}
+		run() {}
 	}
+	let graph: DependencyGraph;
+	beforeEach(() => {
+		graph = new DependencyGraph();
+	});
 
 	test('Add system', () => {
-		const graph = new DependencyGraph();
 		const system = new TestSystem();
 
 		graph.addSystem(system);

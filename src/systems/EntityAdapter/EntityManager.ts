@@ -1,22 +1,21 @@
-import type { Component, CoreInterface, Entity, System } from './types';
-import { DependencyGraph } from './utils';
-
 /**
- * Creates the Core ECS
+ * Base interface for components.
+ * @interface
  */
-class Core implements CoreInterface {
-	//#region Core state
-	private nextEntityId = 0;
-	private entityPool: Entity[] = [];
-	private entities: Map<Function, Component[]>[] = [];
-	private componentEntityMap: Map<Function, Entity[]> = new Map();
-	private systems: System[] = [];
-	private dependencyGraph: DependencyGraph = new DependencyGraph();
-	//#endregion
+export interface Component {}
 
-	//#region Entity & Component Methods
+export class EntityManager {
+	private nextEntityId = 0;
+	private entityPool: number[] = [];
+	private entities: Map<Function, Component[]>[] = [];
+	private componentEntityMap: Map<Function, number[]> = new Map();
+
+	/**
+	 * Creates a new entity.
+	 * @returns The newly created entity.
+	 */
 	createEntity() {
-		let entity: Entity;
+		let entity: number;
 		if (this.entityPool.length > 0) {
 			entity = this.entityPool.pop()!;
 		} else {
@@ -26,7 +25,11 @@ class Core implements CoreInterface {
 		return entity;
 	}
 
-	destroyEntity(entity: Entity) {
+	/**
+	 * Destroys an entity.
+	 * @param entity - The entity to destroy.
+	 */
+	destroyEntity(entity: number) {
 		const entityComponents = this.entities[entity];
 		if (entityComponents) {
 			entityComponents.forEach((_, type) => {
@@ -43,7 +46,12 @@ class Core implements CoreInterface {
 		this.entityPool.push(entity);
 	}
 
-	addComponent(e: Entity, c: Component) {
+	/**
+	 * Adds a component to an entity.
+	 * @param e - The entity to add the component to.
+	 * @param c - The component to add.
+	 */
+	addComponent(e: number, c: Component) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			entityComponents = new Map<Function, Component[]>();
@@ -63,7 +71,12 @@ class Core implements CoreInterface {
 		}
 	}
 
-	removeComponent(e: Entity, c: Component) {
+	/**
+	 * Removes a component from an entity.
+	 * @param e - The entity to remove the component from.
+	 * @param c - The component to remove.
+	 */
+	removeComponent(e: number, c: Component) {
 		const entityComponents = this.entities[e];
 		if (!entityComponents) {
 			throw new Error(`Entity ${e} does not exist`);
@@ -89,7 +102,12 @@ class Core implements CoreInterface {
 		}
 	}
 
-	addComponents(e: Entity, components: Component[]) {
+	/**
+	 * Adds multiple components to an entity.
+	 * @param e - The entity to add components to.
+	 * @param components - The components to add.
+	 */
+	addComponents(e: number, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			entityComponents = new Map<Function, Component[]>();
@@ -117,7 +135,12 @@ class Core implements CoreInterface {
 		}
 	}
 
-	removeComponents(e: Entity, components: Component[]) {
+	/**
+	 * Removes multiple components from an entity.
+	 * @param e - The entity to remove components from.
+	 * @param components - The components to remove.
+	 */
+	removeComponents(e: number, components: Component[]) {
 		let entityComponents = this.entities[e];
 		if (!entityComponents) {
 			throw new Error(`Entity ${e} does not exist`);
@@ -148,8 +171,15 @@ class Core implements CoreInterface {
 		}
 	}
 
+	/**
+	 * Retrieves a component of a specified type from an entity.
+	 * @template T
+	 * @param entity - The entity to retrieve the component from.
+	 * @param type - The constructor of the component type.
+	 * @returns The instance of the requested component, or undefined if not found.
+	 */
 	getComponent<T extends Component>(
-		entity: Entity,
+		entity: number,
 		type: { new (...args: any[]): T },
 	): T | undefined {
 		const entityComponents = this.entities[entity];
@@ -161,7 +191,12 @@ class Core implements CoreInterface {
 		return componentsOfType ? (componentsOfType[0] as T) : undefined;
 	}
 
-	getEntitiesWithComponents(...types: Array<Function>): Entity[] {
+	/**
+	 * Retrieves entities that have all specified component types.
+	 * @param types - The constructors of the component types.
+	 * @returns The list of entities that have all specified components.
+	 */
+	getEntitiesWithComponents(...types: Array<Function>): number[] {
 		if (types.length === 0) return [];
 
 		const sets = types.map(
@@ -177,41 +212,22 @@ class Core implements CoreInterface {
 		);
 	}
 
-	hasComponent(entity: Entity, type: Function): boolean {
+	/**
+	 * Checks if an entity has a component of a specified type.
+	 * @param entity - The entity to check.
+	 * @param type - The constructor of the component type.
+	 * @returns True if the entity has the component, false otherwise.
+	 */
+	hasComponent(entity: number, type: Function): boolean {
 		const entityComponents = this.entities[entity];
 		return entityComponents ? entityComponents.has(type) : false;
 	}
 
-	getAllEntities(): Entity[] {
-		return this.entities.map((_, entity) => entity);
+	/**
+	 * Retrieves all entities.
+	 * @returns The list of all entities.
+	 */
+	getAllEntities() {
+		return this.entities;
 	}
-	//#endregion
-
-	//#region System Methods
-
-	addSystem(system: System): void {
-		this.systems.push(system);
-		this.dependencyGraph.addSystem(system);
-	}
-
-	getSystem<T extends System>(system: { new (...args: any[]): T }) {
-		return this.systems.find((s) => s instanceof system) as T | undefined;
-	}
-
-	addDependency(system: System, dependency: System): void {
-		this.dependencyGraph.addDependency(system, dependency);
-	}
-
-	async update(deltaTime: number): Promise<void> {
-		const sortedSystems = this.dependencyGraph.topologicalSort();
-		await Promise.all(
-			sortedSystems.map((system) => system.update(deltaTime)),
-		);
-	}
-
-	//#endregion
 }
-
-export type { Component, Entity } from './types';
-export { System } from './types';
-export { Core };

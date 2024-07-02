@@ -1,17 +1,25 @@
 {
-	"name": "ecs-core",
+	"name": "systems-core",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
+	"files": [
+		"dist"
+	],
+	"module": "./dist/systems-core.js",
+	"exports": {
+		".": {
+			"import": "./dist/systems-core.js"
+		}
+	},
 	"scripts": {
 		"dev": "bunx --bun vite",
-		"build": "bunx --bun vite build",
-		"preview": "bunx --bun vite preview"
+		"build": "bunx --bun tsc && bun run build.ts",
+		"lint": "bunx --bun tsc --noEmit && bunx --bun prettier --check ."
 	},
 	"devDependencies": {
-		"@types/bun": "^1.1.5",
-		"prettier": "^3.3.2",
 		"typescript": "^5.5.2",
-		"vite": "^5.3.1"
+		"@types/bun": "^1.1.6",
+		"prettier": "^3.3.2"
 	}
 }
