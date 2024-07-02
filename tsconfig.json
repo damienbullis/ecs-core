@@ -12,6 +12,7 @@
 		"isolatedModules": true,
 		"esModuleInterop": true,
 		"noEmit": true,
+		"types": ["bun-types"],
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,

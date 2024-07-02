@@ -1,25 +1,26 @@
 {
-	"name": "systems-core",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"files": [
-		"dist"
-	],
-	"module": "./dist/systems-core.js",
-	"exports": {
-		".": {
-			"import": "./dist/systems-core.js",
-		}
-	},
-	"scripts": {
-		"dev": "bunx --bun vite",
-		"build": "bun run build.ts"
-		// "prepare": "npm run build"
-	},
-	"devDependencies": {
-		"@types/bun": "^1.1.5",
-		"prettier": "^3.3.2",
-		"typescript": "^5.5.2"
-	}
+  "name": "systems-core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/systems-core.js",
+  "exports": {
+    ".": {
+      "import": "./dist/systems-core.js"
+    }
+  },
+  "scripts": {
+    "dev": "bunx --bun vite",
+    "build": "bun run build.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5.5.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6",
+    "prettier": "^3.3.2"
+  }
 }
