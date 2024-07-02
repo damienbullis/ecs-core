@@ -3,10 +3,6 @@ import { System } from '../core';
 export class EventBus extends System {
 	private channels: { [key: string]: ((data?: any) => void)[] } = {};
 
-	constructor() {
-		super();
-	}
-
 	/**
 	 * Publish an event to a channel.
 	 * @param channel - The event type to publish.

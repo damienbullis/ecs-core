@@ -1,12 +1,15 @@
 {
-	"name": "ecs-core",
+	"name": "systems-core",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
+	"main": "dist/systems-core.umd.js",
+	"module": "dist/systems-core.es.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"dev": "bunx --bun vite",
 		"build": "bunx --bun vite build",
-		"preview": "bunx --bun vite preview"
+		"prepare": "npm run build"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.1.5",
