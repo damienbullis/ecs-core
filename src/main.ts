@@ -5,7 +5,7 @@ export { Core, System } from './core';
 export {
 	EntityAdapter,
 	type Component,
-	SystemGraph,
+	SystemsAdapter,
 	Deferred,
 	EventBus,
 	// Remove Canvas from exports

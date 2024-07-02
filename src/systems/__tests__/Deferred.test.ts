@@ -1,13 +1,13 @@
 import { describe, expect, test, spyOn } from 'bun:test';
 import { Core } from '../../core';
 import { Component, EntityAdapter } from '../EntityAdapter';
-import { SystemGraph } from '../SystemGraph';
+import { SystemsAdapter } from '../SystemsAdapter';
 import { Deferred } from '../Deferred';
 
 describe('Deferred', () => {
 	const core = new Core();
 	const em = core.add(new EntityAdapter());
-	const sm = core.add(new SystemGraph(core));
+	const sm = core.add(new SystemsAdapter(core));
 
 	const deferredSystem = new Deferred(em);
 

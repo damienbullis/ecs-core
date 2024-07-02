@@ -6,7 +6,7 @@ export {
 	SpaceState,
 	TurnCount,
 } from './EntityAdapter';
-export { SystemGraph } from './SystemGraph';
+export { SystemsAdapter } from './SystemsAdapter';
 
 export { Canvas } from './Canvas';
 export { EventBus } from './EventBus';

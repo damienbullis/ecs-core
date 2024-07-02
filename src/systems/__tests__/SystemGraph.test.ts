@@ -1,19 +1,19 @@
 import { describe, expect, test } from 'bun:test';
 import { Core, System } from '../../core';
-import { SystemGraph } from '../SystemGraph';
+import { SystemsAdapter } from '../SystemsAdapter';
 
 describe('SystemManager', () => {
 	test('Add system to core', () => {
 		const core = new Core();
-		const sm = core.add(new SystemGraph(core));
+		const sm = core.add(new SystemsAdapter(core));
 
-		const [added] = core.get(SystemGraph);
+		const [added] = core.get(SystemsAdapter);
 
 		expect(added).toBe(sm);
 	});
 	test('Systems execute in correct order', async () => {
 		const core = new Core();
-		const sm = core.add(new SystemGraph(core));
+		const sm = core.add(new SystemsAdapter(core));
 		const order: string[] = [];
 
 		class SystemA extends System {
@@ -53,7 +53,7 @@ describe('SystemManager', () => {
 
 	test('Handles multiple independent systems', async () => {
 		const core = new Core();
-		const sm = new SystemGraph(core);
+		const sm = new SystemsAdapter(core);
 		const order: string[] = [];
 
 		class SystemA extends System {
@@ -89,7 +89,7 @@ describe('SystemManager', () => {
 
 	test('Cycles in dependencies throw error', () => {
 		const core = new Core();
-		const sm = new SystemGraph(core);
+		const sm = new SystemsAdapter(core);
 
 		class SystemA extends System {
 			run(_: number) {}

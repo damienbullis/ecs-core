@@ -1,6 +1,6 @@
 import { describe, test, expect, jest } from 'bun:test';
 import { Core } from '../../core';
-import { SystemGraph } from '../SystemGraph';
+import { SystemsAdapter } from '../SystemsAdapter';
 import { EntityAdapter } from '../EntityAdapter';
 import { Canvas } from '../Canvas';
 
@@ -25,7 +25,7 @@ global.window = {
 
 describe('Canvas', () => {
 	const core = new Core();
-	const sm = core.add(new SystemGraph(core));
+	const sm = core.add(new SystemsAdapter(core));
 	const em = sm.addSystem(new EntityAdapter());
 	const canvas = sm.addSystem(new Canvas(em));
 

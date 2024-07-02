@@ -1,13 +1,11 @@
 import { Core, System } from '../../core';
 import { DependencyGraph } from './DependencyGraph';
 
-export class SystemGraph extends System {
+export class SystemsAdapter extends System {
 	private dependencyGraph: DependencyGraph = new DependencyGraph();
-	private core: Core;
 
-	constructor(core: Core) {
+	constructor(private core: Core) {
 		super();
-		this.core = core;
 	}
 
 	/**
@@ -31,7 +29,7 @@ export class SystemGraph extends System {
 	}
 
 	/**
-	 * Update all systems in the SystemManager.
+	 * Update all systems in the SystemsAdapter.
 	 * Updates systems in the order determined by the dependency graph.
 	 * @param deltaTime - The time elapsed since the last update call.
 	 */
