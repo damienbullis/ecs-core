@@ -1,6 +1,6 @@
 import { expect, test, describe } from 'bun:test';
 
-import { Core, System } from '.';
+import { Core, System } from './core';
 
 describe('ECS Core', () => {
 	const TestSystem = class extends System {

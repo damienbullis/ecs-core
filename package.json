@@ -6,20 +6,29 @@
 	"files": [
 		"dist"
 	],
-	"module": "./dist/systems-core.js",
-	"exports": {
-		".": {
-			"import": "./dist/systems-core.js"
-		}
-	},
+	"main": "dist/core/index.js",
+	"module": "dist/core/index.esm.js",
+	"types": "dist/core/index.d.ts",
 	"scripts": {
 		"dev": "bunx --bun vite",
-		"build": "bunx --bun tsc && bun run build.ts",
+		"build": "bunx --bun tsc && bun tsup",
 		"lint": "bunx --bun tsc --noEmit && bunx --bun prettier --check ."
 	},
 	"devDependencies": {
-		"typescript": "^5.5.2",
 		"@types/bun": "^1.1.6",
-		"prettier": "^3.3.2"
+		"prettier": "^3.3.2",
+		"tsup": "^8.1.0",
+		"typescript": "^5.5.2"
+	},
+	"tsup": {
+		"entry": [
+			"src/core.ts",
+			"src/systems/index.ts"
+		],
+		"format": [
+			"cjs",
+			"esm"
+		],
+		"dts": true
 	}
 }
