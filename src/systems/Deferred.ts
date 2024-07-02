@@ -1,5 +1,5 @@
 import { System } from '../core';
-import { Component, EntityAdapter } from './EntityAdapter';
+import { Component, EntityAdapter } from '.';
 
 export class Deferred extends System {
 	private deferred: (() => void)[] = [];

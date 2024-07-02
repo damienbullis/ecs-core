@@ -1,4 +1,11 @@
-export { EntityManager } from './EntityManager';
+export {
+	type Component,
+	EntityAdapter,
+	CanvasComponent,
+	PlayerEntityState,
+	SpaceState,
+	TurnCount,
+} from './EntityAdapter';
 export { SystemGraph } from './SystemGraph';
 
 export { Canvas } from './Canvas';
