@@ -3,18 +3,23 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"main": "dist/systems-core.umd.js",
-	"module": "dist/systems-core.es.js",
-	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"module": "./dist/systems-core.js",
+	"exports": {
+		".": {
+			"import": "./dist/systems-core.js",
+		}
+	},
 	"scripts": {
 		"dev": "bunx --bun vite",
-		"build": "bunx --bun vite build",
-		"prepare": "npm run build"
+		"build": "bun run build.ts"
+		// "prepare": "npm run build"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.1.5",
 		"prettier": "^3.3.2",
-		"typescript": "^5.5.2",
-		"vite": "^5.3.1"
+		"typescript": "^5.5.2"
 	}
 }
